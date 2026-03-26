@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FiTech ProCal Laptop Software</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root{--navy:#0d1f3c;--navy-mid:#162d52;--navy-light:#1e3a6e;--red:#d91c2a;--red-bright:#f02233;--gold:#f0a500;--white:#fff;--gray-mid:#8a95a8;--green:#16a34a;--orange:#ea580c;}
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'Barlow',sans-serif;background:var(--navy);color:var(--white);min-height:100vh;}
+    header{background:var(--navy);border-bottom:3px solid var(--red);position:sticky;top:0;z-index:100;box-shadow:0 4px 24px rgba(0,0,0,.5);}
+    .header-inner{max-width:1100px;margin:0 auto;padding:10px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;}
+    .logo-img{height:48px;width:auto;display:block;}
+    .header-badge{background:var(--red);color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.75rem;letter-spacing:2px;text-transform:uppercase;padding:5px 12px;border-radius:3px;}
+
+    main{max-width:1000px;margin:0 auto;padding:40px 24px 80px;}
+    .back-btn{display:inline-flex;align-items:center;gap:6px;background:transparent;color:var(--gray-mid);border:1px solid rgba(255,255,255,.12);border-radius:5px;padding:8px 14px;font-family:'Barlow',sans-serif;font-size:.85rem;font-weight:600;cursor:pointer;transition:all .2s;margin-bottom:28px;text-decoration:none;}
+    .back-btn:hover{color:var(--white);border-color:rgba(255,255,255,.3);}
+
+    .page-heading{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:2.6rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+    .page-heading span{color:var(--red);}
+    .page-sub{font-size:1rem;color:var(--gray-mid);margin-bottom:40px;max-width:680px;line-height:1.6;}
+
+    /* SYSTEM SELECTOR */
+    .system-heading{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.4rem;text-transform:uppercase;letter-spacing:2px;margin-bottom:6px;}
+    .system-sub{font-size:.88rem;color:var(--gray-mid);margin-bottom:24px;}
+    .sys-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:48px;}
+    .sys-card{background:var(--navy-mid);border:2px solid rgba(255,255,255,.07);border-radius:10px;padding:24px 16px;text-align:center;cursor:pointer;transition:all .2s;}
+    .sys-card:hover,.sys-card.active{border-color:var(--red);background:var(--navy-light);transform:translateY(-3px);box-shadow:0 8px 24px rgba(217,28,42,.2);}
+    .sys-card.active{border-color:var(--green);}
+    .sys-card img{width:100%;max-width:110px;height:80px;object-fit:contain;margin-bottom:12px;filter:drop-shadow(0 2px 8px rgba(0,0,0,.5));}
+    .sys-card .sys-name{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1rem;text-transform:uppercase;letter-spacing:1px;}
+    .sys-card .sys-parts{font-size:.72rem;color:var(--gray-mid);margin-top:4px;}
+
+    /* DOWNLOAD PANEL */
+    .download-panel{display:none;animation:fadeUp .3s ease forwards;}
+    .download-panel.active{display:block;}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+
+    .download-hero{background:linear-gradient(135deg,var(--navy-mid),var(--navy-light));border:2px solid var(--red);border-radius:12px;padding:32px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;}
+    .dl-info h2{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1.8rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+    .dl-info p{font-size:.88rem;color:var(--gray-mid);max-width:400px;line-height:1.5;}
+    .download-btn{display:inline-flex;align-items:center;gap:10px;background:var(--red);color:#fff;text-decoration:none;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1.15rem;letter-spacing:2px;text-transform:uppercase;padding:14px 28px;border-radius:6px;transition:all .2s;white-space:nowrap;}
+    .download-btn:hover{background:var(--red-bright);transform:translateY(-2px);box-shadow:0 8px 24px rgba(217,28,42,.4);}
+
+    /* REQUIREMENTS */
+    .req-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-bottom:32px;}
+    .req-card{background:var(--navy-mid);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:16px 18px;display:flex;align-items:flex-start;gap:12px;}
+    .req-icon{font-size:1.4rem;flex-shrink:0;margin-top:2px;}
+    .req-title{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.95rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px;}
+    .req-desc{font-size:.8rem;color:var(--gray-mid);line-height:1.4;}
+    .req-card.warn .req-title{color:#fb923c;}
+    .req-card.warn{border-color:rgba(234,88,12,.25);}
+
+    /* SECTION DIVIDERS */
+    .section-divider{display:flex;align-items:center;gap:16px;margin:36px 0 20px;}
+    .divider-label{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.2rem;text-transform:uppercase;letter-spacing:2px;white-space:nowrap;}
+    .divider-line{flex:1;height:2px;background:linear-gradient(to right,var(--red),transparent);}
+
+    /* STEPS */
+    .steps-list{display:flex;flex-direction:column;gap:14px;margin-bottom:32px;}
+    .step-row{background:var(--navy-mid);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:18px 20px;display:flex;align-items:flex-start;gap:16px;}
+    .step-row.warn-step{border-color:rgba(234,88,12,.3);background:rgba(234,88,12,.05);}
+    .step-badge{width:32px;height:32px;background:var(--red);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1rem;flex-shrink:0;margin-top:1px;}
+    .step-badge.warn-badge{background:var(--orange);}
+    .step-content .step-title{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
+    .step-content p,.step-content li{font-size:.87rem;color:#c8d0de;line-height:1.6;}
+    .step-content strong{color:var(--white);}
+    .step-content ol,.step-content ul{padding-left:18px;margin-top:6px;}
+    .step-content li{margin-bottom:4px;}
+    .step-content .note{font-size:.8rem;color:var(--gold);margin-top:8px;padding:8px 12px;background:rgba(240,165,0,.08);border-left:3px solid var(--gold);border-radius:0 4px 4px 0;}
+
+    /* NOTICE BOX */
+    .notice{border-left:4px solid;border-radius:0 8px 8px 0;padding:14px 18px;margin-bottom:16px;}
+    .notice.gold{background:rgba(240,165,0,.1);border-color:var(--gold);}
+    .notice.orange{background:rgba(234,88,12,.1);border-color:var(--orange);}
+    .notice.red{background:rgba(217,28,42,.1);border-color:var(--red);}
+    .notice .notice-title{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:.82rem;letter-spacing:2px;text-transform:uppercase;margin-bottom:5px;}
+    .notice.gold .notice-title{color:var(--gold);}
+    .notice.orange .notice-title{color:#fb923c;}
+    .notice.red .notice-title{color:#f87171;}
+    .notice p{font-size:.84rem;color:#c8d0de;line-height:1.5;}
+    .notice a{color:#fb923c;}
+
+    /* ACCORDION (for Windows 11 / driver stuff) */
+    .accordion{border:1px solid rgba(255,255,255,.08);border-radius:10px;overflow:hidden;margin-bottom:12px;}
+    .accordion-header{background:var(--navy-light);padding:16px 20px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;}
+    .accordion-title{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1rem;text-transform:uppercase;letter-spacing:1px;}
+    .accordion-tag{font-size:.72rem;padding:2px 8px;border-radius:10px;font-weight:700;letter-spacing:1px;margin-left:10px;}
+    .tag-win10{background:rgba(22,163,74,.2);color:#4ade80;border:1px solid rgba(22,163,74,.3);}
+    .tag-win11{background:rgba(234,88,12,.2);color:#fb923c;border:1px solid rgba(234,88,12,.3);}
+    .tag-troubleshoot{background:rgba(240,165,0,.2);color:var(--gold);border:1px solid rgba(240,165,0,.3);}
+    .accordion-arrow{color:var(--gray-mid);transition:transform .25s;}
+    .accordion.open .accordion-arrow{transform:rotate(90deg);}
+    .accordion-body{display:none;padding:20px;background:var(--navy-mid);}
+    .accordion.open .accordion-body{display:block;}
+    .accordion-body ol,.accordion-body ul{padding-left:18px;}
+    .accordion-body li{font-size:.87rem;color:#c8d0de;line-height:1.6;margin-bottom:5px;}
+    .accordion-body strong{color:var(--white);}
+    .accordion-body p{font-size:.87rem;color:#c8d0de;line-height:1.6;margin-bottom:10px;}
+    .accordion-body .code-block{background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.1);border-radius:5px;padding:10px 14px;font-family:monospace;font-size:.85rem;color:#a5f3fc;margin:8px 0;}
+
+    /* VIDEO */
+    .video-wrap{border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,.07);}
+    .video-label{padding:12px 16px;background:var(--navy-light);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.9rem;text-transform:uppercase;letter-spacing:1px;color:var(--gold);border-bottom:2px solid var(--red);}
+    .video-embed{position:relative;padding-bottom:56.25%;height:0;}
+    .video-embed iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none;}
+
+    /* HH PHOTO */
+    .hh-photo-box{background:var(--navy-mid);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:20px;display:flex;align-items:center;gap:24px;flex-wrap:wrap;margin-bottom:24px;}
+    .hh-photo-box img{width:160px;height:auto;border-radius:6px;flex-shrink:0;}
+    .hh-photo-info .hh-photo-title{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.2rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+    .hh-photo-info p{font-size:.86rem;color:var(--gray-mid);line-height:1.5;}
+    .hh-photo-info .dot-badge{display:inline-block;background:rgba(22,163,74,.2);color:#4ade80;border:1px solid rgba(22,163,74,.3);padding:3px 10px;border-radius:10px;font-size:.72rem;font-weight:700;letter-spacing:1px;margin-bottom:8px;}
+
+    .support-bar{background:var(--navy-mid);border-top:2px solid rgba(255,255,255,.06);padding:24px;text-align:center;margin-top:60px;}
+    .support-bar p{color:var(--gray-mid);font-size:.9rem;}
+    .support-bar a{color:var(--red);font-weight:600;text-decoration:none;}
+    .support-bar .hours{font-size:.8rem;margin-top:4px;}
+
+    @media(max-width:600px){.sys-grid{grid-template-columns:1fr;}. download-hero{flex-direction:column;}.req-grid{grid-template-columns:1fr;}.logo-img{height:36px;}}
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <img src="Images/fitech-logo.webp" alt="FiTech Fuel Injection" class="logo-img">
+    <div class="header-badge">ProCal Laptop Software</div>
+  </div>
+</header>
+
+<main>
+  <a class="back-btn" href="index.html">← Back to Software Home</a>
+
+  <h1 class="page-heading">FiTech <span>ProCal</span> Laptop Software</h1>
+  <p class="page-sub">ProCal is FiTech's PC-based tuning software that connects to your ECU through the handheld. It allows deeper calibration access than the handheld alone. <strong>A Windows laptop is required — Mac is not supported.</strong></p>
+
+  <!-- SYSTEM SELECTOR -->
+  <div class="system-heading">Step 1 — Select Your System</div>
+  <p class="system-sub">Choose the product family to get the correct ProCal software version.</p>
+  <div class="sys-grid">
+    <div class="sys-card" id="card-tb" onclick="selectSys('tb')">
+      <img src="Images/30002_1.webp" alt="Throttle Body">
+      <div class="sys-name">Throttle Body</div>
+      <div class="sys-parts">All Go EFI systems</div>
+    </div>
+    <div class="sys-card" id="card-ls" onclick="selectSys('ls')">
+      <img src="Images/LS.webp" alt="LS / Go Shift">
+      <div class="sys-name">LS &amp; Go Shift</div>
+      <div class="sys-parts">All LS systems + Go Shift TCU</div>
+    </div>
+    <div class="sys-card" id="card-tripower" onclick="selectSys('tripower')">
+      <img src="Images/39610.webp" alt="Tri-Power" onerror="this.src='Images/30002_1.webp'">
+      <div class="sys-name">6-Pack / Tri-Power</div>
+      <div class="sys-parts">39610 Tri-Power system</div>
+    </div>
+  </div>
+
+  <!-- DOWNLOAD PANELS (one per system, shown on selection) -->
+
+  <!-- THROTTLE BODY -->
+  <div class="download-panel" id="panel-tb">
+    <div class="download-hero">
+      <div class="dl-info">
+        <h2>ProCal — Throttle Body Systems</h2>
+        <p>Compatible with all Go EFI throttle body systems. Works on Windows 10 and Windows 11 (see installation notes below).</p>
+      </div>
+      <a class="download-btn" href="https://www.dropbox.com/scl/fi/w3b15gtc2grplfg42c5qo/FiTech-PC-Software.zip?rlkey=d60i4d093aldq21ve7acl597o&dl=1" target="_blank">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download ProCal Software
+      </a>
+    </div>
+    <div id="shared-content-tb"></div>
+  </div>
+
+  <!-- LS / GO SHIFT -->
+  <div class="download-panel" id="panel-ls">
+    <div class="download-hero">
+      <div class="dl-info">
+        <h2>ProCal — LS &amp; Go Shift Systems</h2>
+        <p>Compatible with all LS-based systems and the Go Shift transmission controller. Works on Windows 10 and Windows 11 (see installation notes below).</p>
+      </div>
+      <a class="download-btn" href="https://www.dropbox.com/scl/fi/a80sys2ew6vwrxc8jnz62/LS-Laptop-Software-GO-SHIFT-T529-Setup.rar?rlkey=mtph0dp9mar42zu6vwic4s1y7&dl=1" target="_blank">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download ProCal Software
+      </a>
+    </div>
+    <div id="shared-content-ls"></div>
+  </div>
+
+  <!-- TRI-POWER -->
+  <div class="download-panel" id="panel-tripower">
+    <div class="download-hero">
+      <div class="dl-info">
+        <h2>ProCal — 6-Pack / Tri-Power</h2>
+        <p>Dedicated ProCal software for the 6-Pack and Tri-Power (39610) system. Works on Windows 10 and Windows 11 (see installation notes below).</p>
+      </div>
+      <a class="download-btn" href="https://www.dropbox.com/scl/fi/y1ieka7k43jedso7onvvo/6PackGoEFISetup-Laptop-Software.rar?rlkey=nzx0biwhelgl7fl6h48bedepz&dl=1" target="_blank">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download ProCal Software
+      </a>
+    </div>
+    <div id="shared-content-tripower"></div>
+  </div>
+
+  <!-- SHARED CONTENT TEMPLATE (injected into each panel on select) -->
+  <div id="shared-template" style="display:none;">
+
+    <div class="section-divider"><span class="divider-label">Before You Start — Requirements</span><div class="divider-line"></div></div>
+
+    <div class="req-grid">
+      <div class="req-card warn">
+        <div class="req-icon">💻</div>
+        <div>
+          <div class="req-title">Windows Laptop Required</div>
+          <div class="req-desc">Mac is NOT supported. ProCal is Windows-only software.</div>
+        </div>
+      </div>
+      <div class="req-card warn">
+        <div class="req-icon">🔌</div>
+        <div>
+          <div class="req-title">Data Transfer USB-C Cable</div>
+          <div class="req-desc">Must be a quality <strong>data transfer</strong> cable. Charging-only cables will NOT work.</div>
+        </div>
+      </div>
+      <div class="req-card">
+        <div class="req-icon">🖥️</div>
+        <div>
+          <div class="req-title">Windows 10 Recommended</div>
+          <div class="req-desc">ProCal runs more reliably on Windows 10. Windows 11 requires extra steps — see below.</div>
+        </div>
+      </div>
+      <div class="req-card">
+        <div class="req-icon">🎮</div>
+        <div>
+          <div class="req-title">2-Dot Handheld Required</div>
+          <div class="req-desc">ProCal connects through the handheld. The 2-Dot style is required for laptop connection.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2-DOT HANDHELD PHOTO -->
+    <div class="hh-photo-box">
+      <img src="Images/2dot-handheld.png" alt="2-Dot Handheld">
+      <div class="hh-photo-info">
+        <div class="dot-badge">✓ Required Handheld Style</div>
+        <div class="hh-photo-title">2-Dot Handheld</div>
+        <p>ProCal uses the handheld as a passthrough to connect to the ECU. You must be using the <strong>new-style 2-Dot handheld</strong> — identifiable by the two small dots on the right edge next to the navigation buttons. The cable plugs in from the bottom.</p>
+      </div>
+    </div>
+
+    <div class="section-divider"><span class="divider-label">Installation Steps</span><div class="divider-line"></div></div>
+
+    <div class="notice orange">
+      <div class="notice-title">⚠ K-Line Driver Installation Is the Hard Part</div>
+      <p>The K-Line USB driver is required for ProCal to communicate with the ECU. Windows often blocks unsigned drivers. <strong>Read and watch the full installation video before starting</strong> — the end of the video contains critical tips.</p>
+    </div>
+
+    <div class="steps-list">
+      <div class="step-row">
+        <div class="step-badge">1</div>
+        <div class="step-content">
+          <div class="step-title">Download and Extract the Software</div>
+          <p>Download the ProCal software file above. Extract it using <strong>WinZip or WinRAR</strong> (free at winrar.com). Do not run the installer directly from inside the ZIP/RAR.</p>
+        </div>
+      </div>
+      <div class="step-row warn-step">
+        <div class="step-badge warn-badge">2</div>
+        <div class="step-content">
+          <div class="step-title">Disable Driver Signature Enforcement</div>
+          <p>Before installing the K-Line driver, you must temporarily disable Windows driver signature enforcement. This is required because the K-Line driver is not digitally signed.</p>
+          <div class="note">⚠ This only disables enforcement for the current session — it re-enables automatically on the next reboot.</div>
+          <ol style="margin-top:10px;">
+            <li>Click the <strong>Start button</strong>, then the <strong>Power icon</strong>.</li>
+            <li>Hold <strong>SHIFT</strong> and click <strong>Restart</strong>.</li>
+            <li>On the blue menu: <strong>Troubleshoot → Advanced Options → Startup Settings → Restart</strong>.</li>
+            <li>After restart, press <strong>7</strong> or <strong>F7</strong> to select <em>"Disable driver signature enforcement."</em></li>
+            <li>Windows will boot normally — install the K-Line driver now before rebooting.</li>
+          </ol>
+        </div>
+      </div>
+      <div class="step-row">
+        <div class="step-badge">3</div>
+        <div class="step-content">
+          <div class="step-title">Install the K-Line Driver</div>
+          <p>Inside the extracted ProCal folder, find the <strong>K-Line driver installer</strong> and run it. Complete the installation while driver signature enforcement is still disabled (from Step 2).</p>
+          <div class="note">Do NOT reboot between Step 2 and Step 3 — rebooting will re-enable signature enforcement and the driver install will fail.</div>
+        </div>
+      </div>
+      <div class="step-row">
+        <div class="step-badge">4</div>
+        <div class="step-content">
+          <div class="step-title">Install ProCal Software</div>
+          <p>Run the <strong>ProCal installer</strong> from the extracted folder and follow the on-screen instructions to complete installation.</p>
+        </div>
+      </div>
+      <div class="step-row">
+        <div class="step-badge">5</div>
+        <div class="step-content">
+          <div class="step-title">Check the COM Port Number</div>
+          <p>ProCal requires the USB device to be on <strong>COM7 or lower</strong>. To check and change it:</p>
+          <ol>
+            <li>Plug in the FiTech USB/handheld cable.</li>
+            <li>Press <strong>Windows Key + X</strong> and open <strong>Device Manager</strong>.</li>
+            <li>Expand <strong>Ports (COM &amp; LPT)</strong> and find the FiTech/Prolific device.</li>
+            <li>If the COM number is <strong>8 or higher</strong>, right-click → Properties → Port Settings → Advanced, and change it to COM1–COM7.</li>
+            <li>Unplug and replug the device to confirm.</li>
+          </ol>
+        </div>
+      </div>
+      <div class="step-row">
+        <div class="step-badge">6</div>
+        <div class="step-content">
+          <div class="step-title">Connect Handheld and Launch ProCal</div>
+          <p>Plug your 2-Dot handheld into the laptop with your USB-C cable. On the handheld, scroll to the bottom of the Main Menu → <strong>Handheld Software Mode Selection</strong> → <strong>Laptop Software Connection</strong>. Then launch ProCal on your laptop.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-divider"><span class="divider-label">Troubleshooting & Windows 11</span><div class="divider-line"></div></div>
+
+    <div class="notice gold" style="margin-bottom:16px;">
+      <div class="notice-title">ℹ Windows 11 — Extra Steps Required</div>
+      <p>ProCal is older 16-bit software. Windows 11 (64-bit) requires an additional optional feature to be installed before the setup program will run. See the accordion below for detailed steps.</p>
+    </div>
+
+    <div class="accordion" id="acc-win11">
+      <div class="accordion-header" onclick="toggleAcc('acc-win11')">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="accordion-title">Windows 11 — How to Run the ProCal Installer</div>
+          <span class="accordion-tag tag-win11">Windows 11</span>
+        </div>
+        <div class="accordion-arrow">›</div>
+      </div>
+      <div class="accordion-body">
+        <p>Windows 11 (64-bit) cannot run the older 16-bit ProCal installer unless you install a special Microsoft feature first. Here's how:</p>
+        <ol>
+          <li>Click the <strong>Start button</strong>.</li>
+          <li>Type <strong>Installed apps</strong> and press Enter.</li>
+          <li>Click <strong>Optional features</strong>.</li>
+          <li>Click <strong>Add a feature</strong> at the top.</li>
+          <li>Search for <strong>"16-bit InstallShield Support"</strong>.</li>
+          <li>Check the box beside it and click <strong>Install</strong>.</li>
+          <li>Wait for the install to finish, then try running the ProCal installer again.</li>
+          <li>If prompted to reboot, click <strong>Restart</strong>.</li>
+        </ol>
+        <p style="margin-top:10px;color:var(--gold);font-size:.82rem;">After this step, ProCal should install and run on Windows 11. You will still need to complete the K-Line driver steps (disable driver signature enforcement, etc.).</p>
+      </div>
+    </div>
+
+    <div class="accordion" id="acc-driversig">
+      <div class="accordion-header" onclick="toggleAcc('acc-driversig')">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="accordion-title">Disabling Driver Signature Enforcement — Detailed Steps</div>
+          <span class="accordion-tag tag-win10">Win 10 &amp; 11</span>
+        </div>
+        <div class="accordion-arrow">›</div>
+      </div>
+      <div class="accordion-body">
+        <p><strong>Temporary method (recommended — resets on reboot):</strong></p>
+        <ol>
+          <li>Click <strong>Start → Power icon</strong>.</li>
+          <li>Hold <strong>SHIFT</strong> and click <strong>Restart</strong>.</li>
+          <li>Blue screen appears: click <strong>Troubleshoot</strong>.</li>
+          <li>Click <strong>Advanced Options</strong>.</li>
+          <li>Click <strong>Startup Settings</strong>, then <strong>Restart</strong>.</li>
+          <li>After restart, press <strong>7</strong> or <strong>F7</strong>: <em>"Disable driver signature enforcement."</em></li>
+          <li>Windows boots normally — install your K-Line driver now.</li>
+          <li>Restart when done — enforcement re-enables automatically.</li>
+        </ol>
+        <p style="margin-top:14px;"><strong>Permanent method — Test Mode (advanced users only):</strong></p>
+        <p>Open <strong>Command Prompt as Administrator</strong> and run:</p>
+        <div class="code-block">bcdedit /set testsigning on</div>
+        <p>Restart your computer. Windows will show a "Test Mode" watermark. To turn it off later:</p>
+        <div class="code-block">bcdedit /set testsigning off</div>
+        <p style="margin-top:8px;color:#f87171;font-size:.82rem;">⚠ Test Mode is a security risk and not recommended for general use. Only use if the temporary method is not practical.</p>
+      </div>
+    </div>
+
+    <div class="accordion" id="acc-comport">
+      <div class="accordion-header" onclick="toggleAcc('acc-comport')">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="accordion-title">ProCal Won't Connect — COM Port Fix</div>
+          <span class="accordion-tag tag-troubleshoot">Troubleshooting</span>
+        </div>
+        <div class="accordion-arrow">›</div>
+      </div>
+      <div class="accordion-body">
+        <p>ProCal only works on <strong>COM ports 1 through 7</strong>. If your device is assigned COM8 or higher, ProCal won't see it. Here's how to fix it:</p>
+        <ol>
+          <li><strong>Plug in</strong> the FiTech USB device.</li>
+          <li>Press <strong>Windows Key + X</strong> → <strong>Device Manager</strong>.</li>
+          <li>Expand <strong>Ports (COM &amp; LPT)</strong>.</li>
+          <li>Look for <strong>"Prolific USB-to-Serial Comm Port"</strong> or <strong>"USB Serial Port (COMx)"</strong>.</li>
+          <li>If the COM number is <strong>8 or higher</strong>: right-click → <strong>Properties → Port Settings → Advanced</strong>.</li>
+          <li>In the <strong>COM Port Number</strong> dropdown, select a port <strong>from COM1 to COM7</strong>.</li>
+          <li>Click <strong>OK → OK</strong>, then unplug and replug the device.</li>
+          <li>Check Device Manager again to confirm the new COM number.</li>
+        </ol>
+        <p style="margin-top:10px;color:var(--gold);font-size:.82rem;">If all low COM ports are "in use", you can still assign to one — Windows may warn you, but as long as nothing else is actively using that port, it will work.</p>
+      </div>
+    </div>
+
+    <div class="section-divider"><span class="divider-label">Installation Video</span><div class="divider-line"></div></div>
+
+    <div class="notice gold" style="margin-bottom:16px;">
+      <div class="notice-title">📺 Watch the Full Video Before Installing</div>
+      <p>This video covers the complete ProCal installation including K-Line driver setup. <strong>Watch to the end</strong> — there are helpful tips in the final minutes that prevent the most common issues.</p>
+    </div>
+
+    <div class="video-wrap">
+      <div class="video-label">🔧 ProCal Software Installation — Full Walkthrough (Tech Tuesdays EP7)</div>
+      <div class="video-embed">
+        <iframe src="https://www.youtube.com/embed/hxeCh1T4lRs" allowfullscreen title="ProCal Installation Video"></iframe>
+      </div>
+    </div>
+
+  </div><!-- end shared-template -->
+
+</main>
+
+<div class="support-bar">
+  <p>Need help? Contact FiTech Technical Support: <a href="tel:9513402624">(951) 340-2624</a> &nbsp;|&nbsp; <a href="mailto:techmail@fitechefi.com">techmail@fitechefi.com</a></p>
+  <p class="hours" style="color:var(--gray-mid);font-size:.8rem;margin-top:4px;">Mon–Fri 7:00am–5:00pm PST &nbsp;|&nbsp; Saturday 8:00am–12:00pm PST</p>
+</div>
+
+<script>
+const PANELS = {
+  tb:       {card:"card-tb",       panel:"panel-tb",       content:"shared-content-tb"},
+  ls:       {card:"card-ls",       panel:"panel-ls",       content:"shared-content-ls"},
+  tripower: {card:"card-tripower", panel:"panel-tripower", content:"shared-content-tripower"},
+};
+
+let currentSys = null;
+
+function selectSys(id){
+  // Deactivate all
+  Object.values(PANELS).forEach(p=>{
+    document.getElementById(p.card).classList.remove("active");
+    document.getElementById(p.panel).classList.remove("active");
+  });
+
+  // Activate selected
+  const p = PANELS[id];
+  document.getElementById(p.card).classList.add("active");
+
+  // Clone and inject shared content if not already done
+  const contentTarget = document.getElementById(p.content);
+  if(!contentTarget.innerHTML.trim()){
+    const template = document.getElementById("shared-template");
+    contentTarget.innerHTML = template.innerHTML;
+  }
+
+  document.getElementById(p.panel).classList.add("active");
+  currentSys = id;
+
+  // Smooth scroll to panel
+  setTimeout(()=>{
+    document.getElementById(p.panel).scrollIntoView({behavior:"smooth", block:"start"});
+  }, 100);
+}
+
+function toggleAcc(id){
+  const acc = document.getElementById(id);
+  // Close all accordions in same panel first (optional — remove if you want multi-open)
+  // acc.closest('.download-panel').querySelectorAll('.accordion.open').forEach(a=>{ if(a!==acc) a.classList.remove('open'); });
+  acc.classList.toggle("open");
+}
+</script>
+</body>
+</html>

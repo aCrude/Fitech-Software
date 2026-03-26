@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FiTech Admin – Software Link Manager</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root{--navy:#0d1f3c;--navy-mid:#162d52;--navy-light:#1e3a6e;--red:#d91c2a;--gold:#f0a500;--green:#16a34a;--white:#fff;--gray-mid:#8a95a8;--gray-light:#c8d0de;--orange:#ea580c;}
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'Barlow',sans-serif;background:#0a1628;color:var(--white);min-height:100vh;}
+    header{background:var(--navy);border-bottom:3px solid var(--red);}
+    .header-inner{max-width:1300px;margin:0 auto;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;}
+    .logo-img{height:44px;}
+    .admin-badge{background:#7c3aed;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.75rem;letter-spacing:2px;text-transform:uppercase;padding:5px 12px;border-radius:3px;}
+    .top-bar{background:rgba(240,165,0,.08);border-bottom:1px solid rgba(240,165,0,.15);padding:12px 24px;}
+    .top-bar-inner{max-width:1300px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+    .top-bar p{font-size:.85rem;color:var(--gold);}
+    .top-bar p strong{color:var(--white);}
+    .btn-row{display:flex;gap:10px;flex-wrap:wrap;}
+    .btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:5px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.9rem;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border:none;transition:all .2s;text-decoration:none;}
+    .btn-save{background:var(--green);color:#fff;}
+    .btn-save:hover{background:#15803d;}
+    .btn-reset{background:transparent;color:var(--gray-mid);border:1px solid rgba(255,255,255,.15);}
+    .btn-reset:hover{color:var(--white);border-color:rgba(255,255,255,.35);}
+    .btn-visit{background:var(--red);color:#fff;}
+    .btn-visit:hover{background:#f02233;}
+    main{max-width:1300px;margin:0 auto;padding:32px 24px 80px;}
+    #toast{position:fixed;bottom:24px;right:24px;background:var(--green);color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1rem;letter-spacing:1px;padding:12px 24px;border-radius:6px;box-shadow:0 8px 24px rgba(0,0,0,.4);transform:translateY(80px);opacity:0;transition:all .3s;z-index:999;}
+    #toast.show{transform:translateY(0);opacity:1;}
+
+    /* STATS BAR */
+    .stats-bar{background:var(--navy-mid);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:16px 24px;margin-bottom:32px;display:flex;align-items:center;gap:32px;flex-wrap:wrap;}
+    .stat-item{text-align:center;}
+    .stat-num{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:2rem;line-height:1;}
+    .stat-num.green{color:#4ade80;}
+    .stat-num.gold{color:var(--gold);}
+    .stat-num.red{color:#f87171;}
+    .stat-label{font-size:.75rem;color:var(--gray-mid);text-transform:uppercase;letter-spacing:1px;margin-top:2px;}
+    .stat-divider{width:1px;height:40px;background:rgba(255,255,255,.08);}
+    .stat-note{font-size:.82rem;color:var(--gray-mid);flex:1;}
+    .stat-note strong{color:var(--white);}
+
+    .section-head{display:flex;align-items:center;gap:16px;margin:36px 0 14px;}
+    .section-head h2{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1.5rem;text-transform:uppercase;letter-spacing:1px;}
+    .section-head .line{flex:1;height:2px;background:linear-gradient(to right,var(--red),transparent);}
+    .section-desc{font-size:.83rem;color:var(--gray-mid);margin-bottom:18px;}
+
+    /* VIDEO SECTION */
+    .video-section{background:var(--navy-mid);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:20px 24px;margin-bottom:8px;}
+    .video-row{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+    .field-group label{display:block;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.82rem;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px;}
+    .field-group .input-wrap{display:flex;align-items:center;gap:8px;}
+    .field-group input{flex:1;background:var(--navy);border:1px solid rgba(255,255,255,.12);border-radius:5px;padding:9px 12px;font-family:'Barlow',sans-serif;font-size:.88rem;color:var(--white);transition:border-color .2s;}
+    .field-group input:focus{outline:none;border-color:var(--red);}
+    .field-group input.has-value{border-color:rgba(22,163,74,.7);}
+    .led{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+    .led.on{background:var(--green);box-shadow:0 0 6px rgba(22,163,74,.8);}
+    .led.off{background:rgba(255,255,255,.15);}
+
+    /* SYSTEM BLOCKS */
+    .system-block{background:var(--navy-mid);border:1px solid rgba(255,255,255,.07);border-radius:10px;margin-bottom:14px;overflow:hidden;}
+    .system-block-header{background:var(--navy-light);padding:12px 20px;display:flex;align-items:center;gap:14px;cursor:pointer;user-select:none;border-bottom:2px solid var(--red);}
+    .system-block-header img{width:44px;height:32px;object-fit:contain;filter:drop-shadow(0 1px 4px rgba(0,0,0,.5));}
+    .system-name{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1.15rem;text-transform:uppercase;letter-spacing:1px;flex:1;}
+    .system-status{font-size:.78rem;font-weight:600;white-space:nowrap;}
+    .status-all-set{color:#4ade80;}
+    .status-partial{color:var(--gold);}
+    .status-none{color:var(--gray-mid);}
+    .chevron{transition:transform .25s;font-size:1rem;color:var(--gray-mid);}
+    .system-block.open .chevron{transform:rotate(90deg);}
+    .system-block-body{display:none;padding:16px 20px;}
+    .system-block.open .system-block-body{display:block;}
+    .shared-note{background:rgba(240,165,0,.07);border:1px solid rgba(240,165,0,.18);border-radius:5px;padding:8px 12px;font-size:.8rem;color:var(--gold);margin-bottom:14px;}
+
+    /* LINK TABLE */
+    .link-table{width:100%;border-collapse:collapse;}
+    .link-table th{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.75rem;letter-spacing:1px;text-transform:uppercase;color:var(--gray-mid);padding:5px 8px;text-align:left;border-bottom:1px solid rgba(255,255,255,.07);}
+    .link-table td{padding:5px 6px;vertical-align:middle;}
+    .link-table tr:not(:last-child) td{border-bottom:1px solid rgba(255,255,255,.03);}
+    .part-label{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.9rem;white-space:nowrap;}
+    .file-label{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:.78rem;color:var(--gold);}
+    .hh-tag{display:inline-block;font-size:.72rem;padding:2px 7px;border-radius:3px;font-weight:600;white-space:nowrap;}
+    .hh-old-arrow{background:rgba(139,92,246,.15);color:#c4b5fd;border:1px solid rgba(139,92,246,.25);}
+    .hh-old-noarrow{background:rgba(99,102,241,.15);color:#a5b4fc;border:1px solid rgba(99,102,241,.25);}
+    .hh-new-nodot{background:rgba(14,165,233,.15);color:#7dd3fc;border:1px solid rgba(14,165,233,.25);}
+    .hh-new-2dot{background:rgba(16,185,129,.15);color:#6ee7b7;border:1px solid rgba(16,185,129,.25);}
+    .link-cell{display:flex;align-items:center;gap:6px;}
+    .link-input{flex:1;background:var(--navy);border:1px solid rgba(255,255,255,.09);border-radius:4px;padding:6px 10px;font-family:'Barlow',sans-serif;font-size:.8rem;color:var(--white);transition:border-color .2s;}
+    .link-input:focus{outline:none;border-color:var(--red);}
+    .link-input.has-value{border-color:rgba(22,163,74,.65);}
+    .link-input.is-default{color:#c8d0de;}
+    .link-input.is-override{color:#fde68a;border-color:rgba(240,165,0,.6);}
+    .status-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+    .dot-set{background:var(--green);box-shadow:0 0 5px rgba(22,163,74,.7);}
+    .dot-empty{background:rgba(255,255,255,.12);}
+    .default-badge{font-size:.65rem;padding:1px 5px;border-radius:3px;background:rgba(255,255,255,.06);color:var(--gray-mid);border:1px solid rgba(255,255,255,.08);white-space:nowrap;}
+    .override-badge{font-size:.65rem;padding:1px 5px;border-radius:3px;background:rgba(240,165,0,.15);color:var(--gold);border:1px solid rgba(240,165,0,.3);white-space:nowrap;}
+    .na-row td{opacity:.4;}
+
+    @media(max-width:700px){.video-row{grid-template-columns:1fr;}.top-bar-inner{flex-direction:column;align-items:flex-start;}.stats-bar{gap:16px;}}
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <img src="Images/fitech-logo.webp" alt="FiTech" class="logo-img">
+    <div class="admin-badge">⚙ Admin — Link Manager</div>
+  </div>
+</header>
+
+<div class="top-bar">
+  <div class="top-bar-inner">
+    <p>Links shown in <strong style="color:#c8d0de">white</strong> are the current defaults baked into the site. Links in <strong style="color:#fde68a">yellow</strong> are overrides you've saved. All green LEDs = link is active.</p>
+    <div class="btn-row">
+      <button class="btn btn-reset" onclick="resetAll()">↺ Clear My Overrides</button>
+      <a class="btn btn-visit" href="index.html" target="_blank">↗ View Customer Site</a>
+      <button class="btn btn-save" onclick="saveAll()">✓ Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<main>
+
+  <!-- STATS -->
+  <div class="stats-bar" id="stats-bar">
+    <div class="stat-item"><div class="stat-num green" id="stat-set">—</div><div class="stat-label">Links Set</div></div>
+    <div class="stat-divider"></div>
+    <div class="stat-item"><div class="stat-num red" id="stat-missing">—</div><div class="stat-label">Not Set</div></div>
+    <div class="stat-divider"></div>
+    <div class="stat-item"><div class="stat-num gold" id="stat-override">—</div><div class="stat-label">Overridden</div></div>
+    <div class="stat-divider"></div>
+    <div class="stat-note"><strong>Note:</strong> "Not Set" links show the "contact support" message to customers. Overridden links (yellow) take priority over the defaults. Use the Reset button to remove all your overrides and go back to defaults.</div>
+  </div>
+
+  <!-- VIDEO LINKS -->
+  <div class="section-head"><h2>Video Links</h2><div class="line"></div></div>
+  <p class="section-desc">These control the two video embeds on the download page. Paste a regular YouTube URL — it converts automatically.</p>
+  <div class="video-section">
+    <div class="video-row">
+      <div class="field-group">
+        <label>🔧 Updating the ECU Software</label>
+        <div class="input-wrap">
+          <span class="led" id="led-vid-ecu"></span>
+          <input type="url" id="vid-ecu" placeholder="https://www.youtube.com/watch?v=...">
+        </div>
+      </div>
+      <div class="field-group">
+        <label>🔧 Updating the Handheld Software</label>
+        <div class="input-wrap">
+          <span class="led" id="led-vid-hh"></span>
+          <input type="url" id="vid-hh" placeholder="https://www.youtube.com/watch?v=...">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SOFTWARE LINKS -->
+  <div class="section-head"><h2>Software Download Links</h2><div class="line"></div></div>
+  <p class="section-desc">All current links are shown. White = default baked into the site. Yellow = your saved override. Edit any field and hit <strong>Save Changes</strong> to override. To remove an override and go back to the default, clear the field and save.</p>
+
+  <div id="systems-container"></div>
+</main>
+
+<div id="toast">✓ Saved!</div>
+
+<script>
+// ══════════════════════════════════════════════════════
+//  THE COMPLETE DEFAULT LINKS — must match index.html exactly
+//  This is the single source of truth for the admin panel.
+// ══════════════════════════════════════════════════════
+const DEFAULT_LINKS = {
+  // ── TB 30001 + 30002 (same file) ──
+  "30001-old-arrow":   "https://www.dropbox.com/scl/fi/w5oa523dwpvzzsvey72eg/30002.30001-T210-OLD-ARROW-Handheld.rar?rlkey=ruoo5nw7c0hp9m9jujxxdnq51&dl=1",
+  "30001-old-noarrow": "https://www.dropbox.com/scl/fi/tc75kgm7tggjz2gj9t6br/30002.30001-T210-NO-ARROW-Handheld.rar?rlkey=dstdy7bdqkg63drnydt0oz9z0&dl=1",
+  "30001-new-nodot":   "https://www.dropbox.com/scl/fi/emjrxqc8a4irb219g6dwp/New-HH-30001.30002-T210-v1.34-NoDot.rar?rlkey=m58vr0c3jalfpxx8m56c4mtpu&dl=1",
+  "30001-new-2dot":    "https://www.dropbox.com/scl/fi/4shf576rlimyd58v96s5h/30001.30002-T210-v1.53-2DOT.zip?rlkey=tpc19pthmwoljplr4x6f6vh9y&dl=1",
+  "30002-old-arrow":   "https://www.dropbox.com/scl/fi/w5oa523dwpvzzsvey72eg/30002.30001-T210-OLD-ARROW-Handheld.rar?rlkey=ruoo5nw7c0hp9m9jujxxdnq51&dl=1",
+  "30002-old-noarrow": "https://www.dropbox.com/scl/fi/tc75kgm7tggjz2gj9t6br/30002.30001-T210-NO-ARROW-Handheld.rar?rlkey=dstdy7bdqkg63drnydt0oz9z0&dl=1",
+  "30002-new-nodot":   "https://www.dropbox.com/scl/fi/emjrxqc8a4irb219g6dwp/New-HH-30001.30002-T210-v1.34-NoDot.rar?rlkey=m58vr0c3jalfpxx8m56c4mtpu&dl=1",
+  "30002-new-2dot":    "https://www.dropbox.com/scl/fi/4shf576rlimyd58v96s5h/30001.30002-T210-v1.53-2DOT.zip?rlkey=tpc19pthmwoljplr4x6f6vh9y&dl=1",
+  // ── 30003 ──
+  "30003-old-arrow":   "https://www.dropbox.com/scl/fi/5s5c5qfjbvvw5vp24ft7x/30003-T210-OLD-ARROW-Handheld.rar?rlkey=8cc0au8eihzpbzvsg9oedqq0w&dl=1",
+  "30003-old-noarrow": "https://www.dropbox.com/scl/fi/rh1eckxadgtr32mq4iab3/30003-T210-NO-ARROW-Handheld.rar?rlkey=ekibhhrk4m74nx2ocwdaaebvi&dl=1",
+  "30003-new-nodot":   "https://www.dropbox.com/scl/fi/pdevvua0v27yrher9ru60/New-hh-30003-T1210-v1.34-NoDOT.rar?rlkey=8xm44414zmb4u5tqdgutnxk2a&dl=1",
+  "30003-new-2dot":    "https://www.dropbox.com/scl/fi/sb02u4vi1ii2nl6he6516/30003-T210-v1.53.zip?rlkey=odju5mr7xs7lgn8q33wpio8qy&dl=1",
+  // ── 30004 ──
+  "30004-old-arrow":   "https://www.dropbox.com/scl/fi/kwe89jlnx5oclghe4xokp/OLD-HH-30004-T210-OldARROW.rar?rlkey=iyox4uxjbvou0jxqme886ahqb&dl=1",
+  "30004-old-noarrow": "https://www.dropbox.com/scl/fi/hw7f5cjamarhaj9b4bhtg/30004-T210-No-Arrows.rar?rlkey=f7cxjzorxayxvf3yz1hm3oid3&dl=1",
+  "30004-new-nodot":   "https://www.dropbox.com/scl/fi/w9mskgzejarc76ij6gvg4/New-HH-30004-T210-v1.34-NoDot.rar?rlkey=ja4h79sz5uj7jel2i5bo8fizs&dl=1",
+  "30004-new-2dot":    "https://www.dropbox.com/scl/fi/36p6eulk2w671tip1pcgo/V8_30004-T210-V1.53-2Dot.zip?rlkey=tw76rxee4owtzj5p21csx0y6l&dl=1",
+  // ── 30005 (no old-noarrow) ──
+  "30005-old-arrow":   "https://www.dropbox.com/scl/fi/2a24xebm31q7boe1q40rf/30005-T210-OLD-ARROW-Handheld.rar?rlkey=hyvtv7zldx03vezys2htkzvd5&dl=1",
+  "30005-old-noarrow": "#",
+  "30005-new-nodot":   "https://www.dropbox.com/scl/fi/vkwj5cdkqgyfbxiqybecv/New-HH-30005-v.1.34-NoDOT.zip?rlkey=8ilh301z6s9p8iemb3ubs3ihi&dl=1",
+  "30005-new-2dot":    "https://www.dropbox.com/scl/fi/9hw8p3wbgtf2vbrex00md/30005-T210-v1.49-2DOT.zip?rlkey=r80oys7yk7sw68gt0tnxkhomo&dl=1",
+  // ── 30008 ──
+  "30008-old-arrow":   "https://www.dropbox.com/scl/fi/gzuk7baj8ag7r2vr706vl/30008-T210-OLD-ARROW-Handheld.rar?rlkey=scjmxn515apikcvluzzwrjwps&dl=1",
+  "30008-old-noarrow": "https://www.dropbox.com/scl/fi/xv9zkapydr14p4815ceh4/30008-T210-OLD-NO_ARROW-Handheld.rar?rlkey=vvlcv9zqm44jccs336wf233vv&dl=1",
+  "30008-new-nodot":   "https://www.dropbox.com/scl/fi/6wa06zd9vl1rh4naibmyf/New-HH-30008-T210-v1.34-NoDOT.zip?rlkey=uvnonf9e2ywf7ca3e5z6r3swo&dl=1",
+  "30008-new-2dot":    "https://www.dropbox.com/scl/fi/0p5y94vdgl78courxokcq/30008-T210-v1.49-2DOT.zip?rlkey=15yl0z7fm21iz026y6er345p6&dl=1",
+  // ── 30012 ──
+  "30012-old-arrow":   "https://www.dropbox.com/scl/fi/j6i843e5egowh8bqty543/Old-HH-30012-T210-OldARROW.rar?rlkey=v9izhfjgcifh6c0ogc9p64uc9&dl=1",
+  "30012-old-noarrow": "https://www.dropbox.com/scl/fi/qe3vgb2p27sho2k2v4uex/30012-T210-Old-NO_ARROW.rar?rlkey=svoa5nfg1muythtmrol84dljv&dl=1",
+  "30012-new-nodot":   "https://www.dropbox.com/scl/fi/qq3zlpzcjpjcxc9vow7fg/NewHH-30012-T210-1.34-NoDot.zip?rlkey=6w9d332topart2xg46iqezonn&dl=1",
+  "30012-new-2dot":    "https://www.dropbox.com/scl/fo/e912xel8mpbl1o6b2pl8l/AByqc30ik2p0zu3Z5dO3KCc?rlkey=dw4kah0w6kh6ze06n78t1kxb5&dl=1",
+  // ── 30020 (2-dot only) ──
+  "30020-old-arrow":   "#", "30020-old-noarrow": "#", "30020-new-nodot": "#",
+  "30020-new-2dot":    "https://www.dropbox.com/scl/fi/1v5nffw0baeq2lfq4ogro/30020-SR196j-v1.53.zip?rlkey=ixntm80y6w6muj275qmqhckzi&dl=1",
+  // ── 30061 ──
+  "30061-old-arrow":   "https://www.dropbox.com/scl/fi/nbzfs9dfrmjr42xuwto81/30061_2-T210-Old-Handheld-Arrow.rar?rlkey=al01y4jh2dvdyf3fifvqqw15m&dl=1",
+  "30061-old-noarrow": "#",
+  "30061-new-nodot":   "https://www.dropbox.com/scl/fi/ibgko8yckvfnqtyg8km2l/30061_2-T210-New-Handheld-noDOT-v.1.34-1.rar?rlkey=k71l49czd3jt3enot6o0m5plr&dl=1",
+  "30061-new-2dot":    "https://www.dropbox.com/scl/fi/r5mzn8q7b2yd50byp7xpz/30061_2-T210-v1.53.zip?rlkey=s1p6gj8seu2mqt0xdyyah64ui&dl=1",
+  // ── 30064 (no old style) ──
+  "30064-old-arrow":   "#", "30064-old-noarrow": "#",
+  "30064-new-nodot":   "https://www.dropbox.com/scl/fi/qye2vnkdd9u279rzp85le/30064-T210-new-Handheld-noDOT-v1.34-1.rar?rlkey=targ4a838q9h4ovqfkluzpfzc&dl=1",
+  "30064-new-2dot":    "https://www.dropbox.com/scl/fi/3iqaiotcuh4rys6chn4vj/30064-T210-v1.53.zip?rlkey=l549fz57azna3gyvq6pyojlcl&dl=1",
+  // ── 39001 ──
+  "39001-old-arrow":   "https://www.dropbox.com/scl/fi/2zi9cm5hbxxpr10jje2hr/39001-TWO-BBL-T210-OLD-ARROW-Handheld.rar?rlkey=xn2a07m4q68dtu365dfyei0l6&dl=1",
+  "39001-old-noarrow": "#",
+  "39001-new-nodot":   "https://www.dropbox.com/scl/fi/wntfytopaz05u78fittjd/New-HH-39001-Two-Barrel-400hp-T210-v1.34-No-DOT.zip?rlkey=00sqjbiafqc7mwv5pj60tttms&dl=1",
+  "39001-new-2dot":    "https://www.dropbox.com/scl/fi/sj6e3selx1gne4n1qpzj0/39001-2Barrel-400hp-NoPWM-T210-v1.49-2DOT.zip?rlkey=srfs1mlio194r3exwkkgf55iu&dl=1",
+  // ── 39610 Tri-Power (2-dot only) ──
+  "39610-old-arrow":   "#", "39610-old-noarrow": "#", "39610-new-nodot": "#",
+  "39610-new-2dot":    "https://www.dropbox.com/scl/fi/ml1h3cq414m3h5ci4a48e/39610-2-DOT-1.53.zip?rlkey=ku2qadt93d1wj9ohcu4ecsnyj&dl=1",
+  // ── LS 16-bit NA ──
+  "70050-NA-old-arrow":   "https://www.dropbox.com/scl/fi/j6y33j1gpglgiyu1cbri2/70050-T538-NA-Old-HH-ARROW.rar?rlkey=ee6re6vwwnxsv8glyb1mvhl4k&dl=1",
+  "70050-NA-old-noarrow": "https://www.dropbox.com/scl/fi/u3bmwk7bxm865cqx40foj/70050-T538-NA-Old-HH-No_Arrow.rar?rlkey=r7b5c2pke2u3emknhfef84x5o&dl=1",
+  "70050-NA-new-nodot":   "https://www.dropbox.com/scl/fi/m7xp6zuuj3o7e6ffsdlta/70050-T538-NA-newHH-No-DOT-v1.34.rar?rlkey=6gtv2f1194lqr42jd1q5cqedw&dl=1",
+  "70050-NA-new-2dot":    "https://www.dropbox.com/scl/fo/6vwvzbk54tya7glex8dx7/ADzK5Ixk3RL9o1h7RG27X1o?rlkey=clwdlt6f6b7ghcp0jazyit8q9&dl=1",
+  // ── LS 16-bit SC ──
+  "70050-SC-old-arrow":   "#", "70050-SC-old-noarrow": "#", "70050-SC-new-nodot": "#",
+  "70050-SC-new-2dot":    "https://www.dropbox.com/scl/fi/wm0fd2852r1jhusaskong/70050-T541-SC-v1.53.zip?rlkey=stdfqoov3gji7j5m2dzu28tvx&dl=1",
+  // ── LS 32-bit (2-dot only) ──
+  "70050-32bit-new-2dot": "https://www.dropbox.com/scl/fi/3mep9m1zqvg5ux7iv1yl2/LS32bit-T671-v1.79.zip?rlkey=bm6pk19wyisl49g80w6kwbo2n&dl=1",
+  // ── TPI ──
+  "38350-old-style":      "https://www.dropbox.com/scl/fi/q3bf49nyzlj21mpprs9pw/Handheld-T672-TPI-38350-1_79.rar?rlkey=bmlmbmhwiounvmba11gs8loo2&dl=1",
+  "38350-new-2dot":       "https://www.dropbox.com/scl/fi/fm7jf4wrnp1ylj4fnh49s/TPI-T541A-v1.53.zip?rlkey=mr1d41q5c13qrq9iwkl40gn9c&dl=1",
+  // ── Ultra Ram ──
+  "38301-old-arrow":   "#", "38301-old-noarrow": "#", "38301-new-nodot": "#",
+  "38301-new-2dot":    "https://www.dropbox.com/scl/fi/iar92dpxeekern7ldupdw/38301-T197E-v1.53.zip?rlkey=sk137lma6smx08j7qqm2fxr6j&dl=1",
+  // ── Go Port ──
+  "30014-old-arrow":   "https://www.dropbox.com/scl/fi/uyhdg4h67oldkwelestol/30014-old-Handheld-Arrow-T210-1.rar?rlkey=uvc60e559tbsnka83nci93iex&dl=1",
+  "30014-old-noarrow": "#", "30014-new-nodot": "#",
+  "30014-new-2dot":    "https://www.dropbox.com/scl/fi/m57dw3o4fqub8qrxs26op/30014-T210-v1.53.zip?rlkey=gaq173ff6ncmfvbiekgicfef7&dl=1",
+  // ── Go Shift 20010 ──
+  "20010-old-arrow":        "#", "20010-old-noarrow": "#", "20010-new-nodot": "#",
+  "20010-16bit-new-2dot":   "https://www.dropbox.com/scl/fo/brmt1rmro5o47yrffiu9a/AGl4JGrT7dPO2N3xLW1Ivxc?rlkey=8ssmzz0s876q1td909g15x8ig&dl=1",
+  "20010-32bit-new-2dot":   "https://www.dropbox.com/scl/fi/kq2j1l786s80vb36y8b32/20010-32bit-v1.61.zip?rlkey=obb5kpywz0qtwh7mhnekcycc8&dl=1",
+  // ── Go Shift 20011 ──
+  "20011-old-arrow":   "#", "20011-old-noarrow": "#", "20011-new-nodot": "#",
+  "20011-new-2dot":    "https://www.dropbox.com/scl/fo/y95orm989egzj0fy17top/AEzes1f_cEN22uOL049iBUg?rlkey=3jvsfo565eo3ewafizrmshd76&dl=1",
+  // ── Go Shift 20012 (pending) ──
+  "20012-old-arrow":   "#", "20012-old-noarrow": "#", "20012-new-nodot": "#", "20012-new-2dot": "#",
+  // ── Nemesis ──
+  "30070-old-arrow":   "#", "30070-old-noarrow": "#", "30070-new-nodot": "#",
+  "30070-new-2dot":    "https://www.dropbox.com/scl/fi/xgkxe7nn1y59mgy0ex91y/30070-NEMESIS-T671-v1.79.rar?rlkey=by0kgubtya8qo2mcl153b56sb&dl=1",
+};
+
+const DEFAULT_VIDEOS = {
+  ecu:      "https://www.youtube.com/watch?v=k_pQY21HY8g",
+  handheld: "https://www.youtube.com/watch?v=JaAPfsIcOmE",
+};
+
+// ══════════════════════════════════════════════════════
+//  SYSTEM DISPLAY STRUCTURE
+// ══════════════════════════════════════════════════════
+const HH = [
+  {id:"old-arrow",   label:"Old Arrow",    cls:"hh-old-arrow"},
+  {id:"old-noarrow", label:"Old No-Arrow", cls:"hh-old-noarrow"},
+  {id:"new-nodot",   label:"New No-Dot",   cls:"hh-new-nodot"},
+  {id:"new-2dot",    label:"New 2-Dot",    cls:"hh-new-2dot"},
+];
+
+const SYSTEMS = [
+  { id:"tb", name:"Throttle Body", img:"Images/30002_1.webp",
+    rows:[
+      {label:"30001 / 30002", note:"Same file for both", keys:["30001-old-arrow","30001-old-noarrow","30001-new-nodot","30001-new-2dot"]},
+      {label:"30003",  keys:["30003-old-arrow","30003-old-noarrow","30003-new-nodot","30003-new-2dot"]},
+      {label:"30004",  keys:["30004-old-arrow","30004-old-noarrow","30004-new-nodot","30004-new-2dot"]},
+      {label:"30005",  note:"No old no-arrow file", keys:["30005-old-arrow","30005-old-noarrow","30005-new-nodot","30005-new-2dot"]},
+      {label:"30008",  keys:["30008-old-arrow","30008-old-noarrow","30008-new-nodot","30008-new-2dot"]},
+      {label:"30012",  keys:["30012-old-arrow","30012-old-noarrow","30012-new-nodot","30012-new-2dot"]},
+      {label:"30020",  note:"2-Dot only", keys:["30020-old-arrow","30020-old-noarrow","30020-new-nodot","30020-new-2dot"]},
+      {label:"30061",  note:"No old no-arrow", keys:["30061-old-arrow","30061-old-noarrow","30061-new-nodot","30061-new-2dot"]},
+      {label:"30064",  note:"New HH only", keys:["30064-old-arrow","30064-old-noarrow","30064-new-nodot","30064-new-2dot"]},
+      {label:"39001",  note:"No old no-arrow", keys:["39001-old-arrow","39001-old-noarrow","39001-new-nodot","39001-new-2dot"]},
+      {label:"39610 Tri-Power", note:"2-Dot only", keys:["39610-old-arrow","39610-old-noarrow","39610-new-nodot","39610-new-2dot"]},
+    ]},
+  { id:"ls16", name:"LS System (16-bit)", img:"Images/LS.webp",
+    note:"All LS part numbers use the same software file — only NA and SC variants differ.",
+    rows:[
+      {label:"LS NA",  note:"Naturally Aspirated", keys:["70050-NA-old-arrow","70050-NA-old-noarrow","70050-NA-new-nodot","70050-NA-new-2dot"]},
+      {label:"LS SC",  note:"Supercharged — 2-Dot only", keys:["70050-SC-old-arrow","70050-SC-old-noarrow","70050-SC-new-nodot","70050-SC-new-2dot"]},
+    ]},
+  { id:"ls32", name:"LS System (32-bit)", img:"Images/LS.webp",
+    note:"New 32-bit ECU (shipped Oct 2025+). 2-Dot handheld only.",
+    rows:[
+      {label:"LS 32-bit", note:"2-Dot only — all part numbers", keys:["70050-32bit-new-2dot"], singleKey:true},
+    ]},
+  { id:"dbw", name:"Drive By Wire (DBW)", img:"Images/DBW.webp",
+    note:"Uses same 32-bit software as LS 32-bit. 2-Dot only.",
+    rows:[
+      {label:"DBW", note:"2-Dot only — same file as LS 32-bit", keys:["70050-32bit-new-2dot"], singleKey:true, readOnly:true},
+    ]},
+  { id:"tpi", name:"TPI System", img:"Images/TPI.webp",
+    note:"All TPI part numbers use the same files. 16-bit = old-style HH. 32-bit = 2-Dot only.",
+    rows:[
+      {label:"TPI 16-bit (old HH)", note:"Old-style handhelds", keys:["38350-old-style"], singleKey:true},
+      {label:"TPI 32-bit (2-Dot)", note:"New 2-Dot handheld only", keys:["38350-new-2dot"], singleKey:true},
+    ]},
+  { id:"ultraram", name:"Ultra Ram (38301)", img:"Images/Ultra_Ram.webp",
+    note:"All Ultra Ram systems use the same file. 2-Dot only.",
+    rows:[
+      {label:"38301", keys:["38301-old-arrow","38301-old-noarrow","38301-new-nodot","38301-new-2dot"]},
+    ]},
+  { id:"goport", name:"Go Port (30014)", img:"Images/Go_Port.webp",
+    note:"All Go Port systems use the same file.",
+    rows:[
+      {label:"30014", keys:["30014-old-arrow","30014-old-noarrow","30014-new-nodot","30014-new-2dot"]},
+    ]},
+  { id:"goshift", name:"Go Shift", img:"Images/Go_Shift.webp",
+    note:"Go Shift has 16-bit and 32-bit variants. Old-style HH links pending for most.",
+    rows:[
+      {label:"20010 16-bit", note:"2-Dot", keys:["20010-old-arrow","20010-old-noarrow","20010-new-nodot","20010-16bit-new-2dot"]},
+      {label:"20010 32-bit", note:"2-Dot only", keys:["20010-32bit-new-2dot"], singleKey:true},
+      {label:"20011",        keys:["20011-old-arrow","20011-old-noarrow","20011-new-nodot","20011-new-2dot"]},
+      {label:"20012",        note:"Pending — no file yet", keys:["20012-old-arrow","20012-old-noarrow","20012-new-nodot","20012-new-2dot"]},
+    ]},
+  { id:"nemesis", name:"Nemesis (30070)", img:"Images/Nemesis.webp",
+    note:"All Nemesis systems use the same file.",
+    rows:[
+      {label:"30070", keys:["30070-old-arrow","30070-old-noarrow","30070-new-nodot","30070-new-2dot"]},
+    ]},
+];
+
+// ══════════════════════════════════════════════════════
+//  HELPERS
+// ══════════════════════════════════════════════════════
+function getSavedOverrides(){ try{ return JSON.parse(localStorage.getItem("fitech_links")||"{}"); } catch(e){ return {}; }}
+function getSavedVideos(){    try{ return JSON.parse(localStorage.getItem("fitech_videos")||"{}"); } catch(e){ return {}; }}
+
+function isSet(url){ return url && url !== "#" && url.trim() !== ""; }
+function isDefault(key, val){ return val === DEFAULT_LINKS[key]; }
+
+function toEmbedUrl(url){
+  if(!url) return DEFAULT_VIDEOS.ecu;
+  const m = url.match(/(?:v=|youtu\.be\/|embed\/)([A-Za-z0-9_-]{11})/);
+  return m ? `https://www.youtube.com/embed/${m[1]}` : url;
+}
+
+function setLED(elId, on){
+  const el = document.getElementById(elId);
+  if(el){ el.className = "led " + (on ? "on" : "off"); }
+}
+
+// ══════════════════════════════════════════════════════
+//  BUILD UI
+// ══════════════════════════════════════════════════════
+function buildUI(){
+  const overrides = getSavedOverrides();
+  const savedVids = getSavedVideos();
+
+  // Videos — show current effective value
+  const ecuVal = savedVids.ecu || DEFAULT_VIDEOS.ecu;
+  const hhVal  = savedVids.handheld || DEFAULT_VIDEOS.handheld;
+  document.getElementById("vid-ecu").value = ecuVal;
+  document.getElementById("vid-hh").value  = hhVal;
+  setLED("led-vid-ecu", isSet(ecuVal));
+  setLED("led-vid-hh",  isSet(hhVal));
+
+  const container = document.getElementById("systems-container");
+  container.innerHTML = "";
+
+  let totalSet = 0, totalMissing = 0, totalOverride = 0;
+
+  SYSTEMS.forEach(sys => {
+    // Count set/missing across all rows
+    let sysSet = 0, sysMissing = 0;
+    let allKeys = [];
+    sys.rows.forEach(row => allKeys.push(...row.keys));
+
+    allKeys.forEach(key => {
+      const effectiveVal = overrides[key] !== undefined ? overrides[key] : DEFAULT_LINKS[key];
+      if(isSet(effectiveVal)) sysSet++;
+      else sysMissing++;
+    });
+
+    const sysTotal = allKeys.length;
+    const statusClass = sysMissing === 0 ? "status-all-set" : sysSet === 0 ? "status-none" : "status-partial";
+    const statusText = sysMissing === 0 ? `✓ All ${sysSet} links set` : `${sysSet}/${sysTotal} set`;
+
+    const block = document.createElement("div");
+    block.className = "system-block";
+    block.id = `block-${sys.id}`;
+    block.innerHTML = `
+      <div class="system-block-header" onclick="toggleBlock('${sys.id}')">
+        <img src="${sys.img}" alt="${sys.name}">
+        <div class="system-name">${sys.name}</div>
+        <div class="system-status ${statusClass}">${statusText}</div>
+        <div class="chevron">›</div>
+      </div>
+      <div class="system-block-body" id="body-${sys.id}">
+        ${sys.note ? `<div class="shared-note">ℹ️ ${sys.note}</div>` : ""}
+        <table class="link-table">
+          <thead>
+            <tr>
+              <th style="width:160px">Part / Variant</th>
+              <th style="width:130px">Handheld Type</th>
+              <th>Current Download URL</th>
+              <th style="width:70px">Status</th>
+              <th style="width:14px"></th>
+            </tr>
+          </thead>
+          <tbody id="rows-${sys.id}"></tbody>
+        </table>
+      </div>`;
+    container.appendChild(block);
+
+    const tbody = document.getElementById(`rows-${sys.id}`);
+
+    sys.rows.forEach(row => {
+      if(row.singleKey) {
+        // Single-key rows (32-bit, TPI variants, etc.)
+        const key = row.keys[0];
+        const defVal  = DEFAULT_LINKS[key] || "#";
+        const override = overrides[key];
+        const effectiveVal = override !== undefined ? override : defVal;
+        const isOverridden = override !== undefined && override !== defVal;
+        const active = isSet(effectiveVal);
+        if(active) totalSet++; else totalMissing++;
+        if(isOverridden) totalOverride++;
+
+        const tr = document.createElement("tr");
+        if(!active) tr.className = "na-row";
+        tr.innerHTML = `
+          <td><span class="part-label">${row.label}</span>${row.note?`<br><span style="font-size:.72rem;color:var(--gray-mid)">${row.note}</span>`:""}</td>
+          <td><span class="hh-tag hh-new-2dot">All Applicable</span></td>
+          <td>
+            <div class="link-cell">
+              <input class="link-input ${active?"has-value":""} ${isOverridden?"is-override":"is-default"}${row.readOnly?" readonly":""}"
+                type="url" data-key="${key}"
+                value="${effectiveVal==="#"?"":effectiveVal}"
+                placeholder="https://www.dropbox.com/..."
+                ${row.readOnly?"readonly title='Shared with LS 32-bit — edit there'":""}>
+              ${isOverridden?`<span class="override-badge">Override</span>`:`<span class="default-badge">Default</span>`}
+            </div>
+          </td>
+          <td><span class="status-dot ${active?"dot-set":"dot-empty"}" id="dot-${key}"></span></td>
+          <td></td>`;
+        tbody.appendChild(tr);
+
+        if(!row.readOnly){
+          const inp = tr.querySelector("input");
+          inp.addEventListener("input", () => onInputChange(inp, key, sys.id));
+        }
+      } else {
+        // 4-variant rows
+        HH.forEach((hh, hi) => {
+          const key = row.keys[hi];
+          if(!key) return;
+          const defVal    = DEFAULT_LINKS[key] || "#";
+          const override  = overrides[key];
+          const effectiveVal = override !== undefined ? override : defVal;
+          const isOverridden = override !== undefined && override !== defVal;
+          const active = isSet(effectiveVal);
+          if(active) totalSet++; else totalMissing++;
+          if(isOverridden) totalOverride++;
+
+          const tr = document.createElement("tr");
+          if(!active) tr.className = "na-row";
+          tr.innerHTML = `
+            <td>${hi===0?`<span class="part-label">${row.label}</span>${row.note?`<br><span style="font-size:.72rem;color:var(--gray-mid)">${row.note}</span>`:""}`:""}</td>
+            <td><span class="hh-tag ${hh.cls}">${hh.label}</span></td>
+            <td>
+              <div class="link-cell">
+                <input class="link-input ${active?"has-value":""} ${isOverridden?"is-override":"is-default"}"
+                  type="url" data-key="${key}"
+                  value="${effectiveVal==="#"?"":effectiveVal}"
+                  placeholder="https://www.dropbox.com/...">
+                ${isOverridden?`<span class="override-badge">Override</span>`:`<span class="default-badge">Default</span>`}
+              </div>
+            </td>
+            <td><span class="status-dot ${active?"dot-set":"dot-empty"}" id="dot-${key}"></span></td>
+            <td></td>`;
+          tbody.appendChild(tr);
+          const inp = tr.querySelector("input");
+          inp.addEventListener("input", () => onInputChange(inp, key, sys.id));
+        });
+      }
+    });
+  });
+
+  // Update stats
+  document.getElementById("stat-set").textContent = totalSet;
+  document.getElementById("stat-missing").textContent = totalMissing;
+  document.getElementById("stat-override").textContent = totalOverride;
+}
+
+function onInputChange(inp, key, sysId){
+  const val = inp.value.trim();
+  const defVal = DEFAULT_LINKS[key] || "#";
+  const active = isSet(val);
+  inp.classList.toggle("has-value", active);
+  // Colour based on whether it matches default or is an override
+  if(!val || val === defVal){
+    inp.className = inp.className.replace(/is-override|is-default/g,"").trim() + " is-default";
+    // Remove override badge, add default badge
+    const cell = inp.closest(".link-cell");
+    cell.querySelectorAll(".override-badge,.default-badge").forEach(b=>b.remove());
+    cell.insertAdjacentHTML("beforeend", `<span class="default-badge">Default</span>`);
+  } else {
+    inp.className = inp.className.replace(/is-override|is-default/g,"").trim() + " is-override";
+    const cell = inp.closest(".link-cell");
+    cell.querySelectorAll(".override-badge,.default-badge").forEach(b=>b.remove());
+    cell.insertAdjacentHTML("beforeend", `<span class="override-badge">Override</span>`);
+  }
+  // Update LED dot
+  const dot = document.getElementById(`dot-${key}`);
+  if(dot) dot.className = `status-dot ${active?"dot-set":"dot-empty"}`;
+  updateSysStatus(sysId);
+}
+
+function updateSysStatus(sysId){
+  const rows = document.querySelectorAll(`#rows-${sysId} input`);
+  let set=0; rows.forEach(r=>{ if(isSet(r.value)) set++; });
+  const statusEl = document.querySelector(`#block-${sysId} .system-status`);
+  if(!statusEl) return;
+  const missing = rows.length - set;
+  statusEl.className = "system-status " + (missing===0?"status-all-set":set===0?"status-none":"status-partial");
+  statusEl.textContent = missing===0 ? `✓ All ${set} links set` : `${set}/${rows.length} set`;
+}
+
+function toggleBlock(id){
+  document.getElementById(`block-${id}`).classList.toggle("open");
+}
+
+// ══════════════════════════════════════════════════════
+//  SAVE / RESET
+// ══════════════════════════════════════════════════════
+function saveAll(){
+  const newLinks = {};
+  document.querySelectorAll(".link-input[data-key]").forEach(inp => {
+    const key = inp.dataset.key;
+    const val = inp.value.trim();
+    const defVal = DEFAULT_LINKS[key] || "#";
+    // Only save overrides — skip if empty or matches default
+    if(val && val !== defVal){ newLinks[key] = val; }
+    else if(!val && defVal !== "#"){ newLinks[key] = "#"; } // explicitly blanked
+  });
+  // Only store the diff from defaults
+  localStorage.setItem("fitech_links", JSON.stringify(newLinks));
+
+  // Videos
+  const ecuRaw = document.getElementById("vid-ecu").value.trim();
+  const hhRaw  = document.getElementById("vid-hh").value.trim();
+  const newVids = {
+    ecu:      ecuRaw  ? toEmbedUrl(ecuRaw)  : DEFAULT_VIDEOS.ecu,
+    handheld: hhRaw   ? toEmbedUrl(hhRaw)   : DEFAULT_VIDEOS.handheld,
+  };
+  const vidDiff = {};
+  if(newVids.ecu !== DEFAULT_VIDEOS.ecu)           vidDiff.ecu      = newVids.ecu;
+  if(newVids.handheld !== DEFAULT_VIDEOS.handheld) vidDiff.handheld = newVids.handheld;
+  if(Object.keys(vidDiff).length) localStorage.setItem("fitech_videos", JSON.stringify(vidDiff));
+  else localStorage.removeItem("fitech_videos");
+
+  showToast("✓ Changes saved!");
+  buildUI(); // Refresh to update badges and stats
+}
+
+function resetAll(){
+  if(!confirm("This will remove ALL your saved overrides and restore the site to its built-in defaults.\n\nAre you sure?")) return;
+  localStorage.removeItem("fitech_links");
+  localStorage.removeItem("fitech_videos");
+  buildUI();
+  showToast("↺ Overrides cleared — defaults restored");
+}
+
+function showToast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"), 2800);
+}
+
+// Video LED update on type
+document.getElementById("vid-ecu").addEventListener("input", function(){ setLED("led-vid-ecu", isSet(this.value)); });
+document.getElementById("vid-hh").addEventListener("input",  function(){ setLED("led-vid-hh",  isSet(this.value)); });
+
+buildUI();
+</script>
+</body>
+</html>

@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FiTech EFI – Software Download Center</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root{--navy:#0d1f3c;--navy-mid:#162d52;--navy-light:#1e3a6e;--red:#d91c2a;--red-bright:#f02233;--gold:#f0a500;--white:#fff;--gray-mid:#8a95a8;--step-done:#16a34a;--orange:#ea580c;--purple:#7c3aed;}
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'Barlow',sans-serif;background:var(--navy);color:var(--white);min-height:100vh;}
+    header{background:var(--navy);border-bottom:3px solid var(--red);position:sticky;top:0;z-index:100;box-shadow:0 4px 24px rgba(0,0,0,.5);}
+    .header-inner{max-width:1100px;margin:0 auto;padding:10px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;}
+    .logo-img{height:48px;width:auto;display:block;}
+    .header-badge{background:var(--red);color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.75rem;letter-spacing:2px;text-transform:uppercase;padding:5px 12px;border-radius:3px;}
+    .alert-banner{background:linear-gradient(90deg,rgba(234,88,12,.15),rgba(124,58,237,.1));border-bottom:2px solid var(--orange);padding:10px 24px;text-align:center;}
+    .alert-banner p{max-width:1100px;margin:0 auto;font-size:.82rem;color:#fcd34d;}
+    .alert-banner a{color:#fb923c;font-weight:700;}
+    .progress-wrap{background:var(--navy-mid);border-bottom:1px solid rgba(255,255,255,.06);}
+    .progress-inner{max-width:1100px;margin:0 auto;padding:0 24px;display:flex;}
+    .progress-step{display:flex;align-items:center;gap:8px;padding:12px 20px 12px 0;opacity:.35;transition:opacity .3s;position:relative;flex:1;}
+    .progress-step::after{content:'›';position:absolute;right:4px;color:var(--gray-mid);}
+    .progress-step:last-child::after{display:none;}
+    .progress-step.active,.progress-step.done{opacity:1;}
+    .step-num{width:26px;height:26px;border-radius:50%;background:var(--navy-light);border:2px solid var(--gray-mid);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.85rem;flex-shrink:0;transition:all .3s;}
+    .progress-step.active .step-num{background:var(--red);border-color:var(--red);}
+    .progress-step.done .step-num{background:var(--step-done);border-color:var(--step-done);}
+    .step-label{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:.75rem;letter-spacing:1px;text-transform:uppercase;color:var(--gray-mid);}
+    .progress-step.active .step-label,.progress-step.done .step-label{color:var(--white);}
+    .step-detail{font-size:.68rem;display:none;color:var(--gold);}
+    .progress-step.done .step-detail{display:block;}
+    main{max-width:1100px;margin:0 auto;padding:40px 24px 80px;}
+    .step-panel{display:none;animation:fadeUp .3s ease forwards;}
+    .step-panel.active{display:block;}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+    .step-heading{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:2.4rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+    .step-heading span{color:var(--red);}
+    .step-sub{font-size:1rem;color:var(--gray-mid);margin-bottom:32px;}
+    .system-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:16px;}
+    .system-card{background:var(--navy-mid);border:2px solid rgba(255,255,255,.07);border-radius:8px;padding:20px 16px;text-align:center;cursor:pointer;transition:all .2s;}
+    .system-card:hover{border-color:var(--red);background:var(--navy-light);transform:translateY(-3px);box-shadow:0 8px 24px rgba(217,28,42,.2);}
+    .system-card img{width:100%;max-width:130px;height:100px;object-fit:contain;margin-bottom:12px;filter:drop-shadow(0 2px 8px rgba(0,0,0,.5));}
+    .system-card .card-name{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1.05rem;text-transform:uppercase;letter-spacing:1px;}
+    .card-badge{display:inline-block;margin-top:5px;padding:2px 8px;border-radius:10px;font-size:.68rem;font-weight:700;letter-spacing:1px;}
+    .badge-new{background:rgba(234,88,12,.2);color:#fb923c;border:1px solid rgba(234,88,12,.4);}
+    .software-note{background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.3);border-radius:8px;padding:12px 16px;margin-bottom:20px;font-size:.85rem;color:var(--gold);}
+    .software-note strong{color:var(--white);}
+    .part-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;}
+    .part-card{background:var(--navy-mid);border:2px solid rgba(255,255,255,.07);border-radius:8px;padding:18px 12px;text-align:center;cursor:pointer;transition:all .2s;}
+    .part-card:hover{border-color:var(--red);background:var(--navy-light);transform:translateY(-2px);}
+    .part-card .part-num{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1.4rem;letter-spacing:1px;}
+    .part-card .part-desc{font-size:.75rem;color:var(--gray-mid);margin-top:4px;}
+    .choice-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:20px;}
+    .choice-card{background:var(--navy-mid);border:2px solid rgba(255,255,255,.07);border-radius:10px;padding:28px 24px;cursor:pointer;transition:all .2s;}
+    .choice-card:hover{border-color:var(--red);background:var(--navy-light);transform:translateY(-3px);}
+    .choice-card.orange:hover{border-color:var(--orange);}
+    .choice-icon{font-size:2rem;margin-bottom:10px;}
+    .choice-tag{display:inline-block;padding:3px 10px;border-radius:4px;font-size:.72rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;}
+    .tag-std{background:rgba(22,163,74,.2);color:#4ade80;border:1px solid rgba(22,163,74,.3);}
+    .tag-32b{background:rgba(234,88,12,.2);color:#fb923c;border:1px solid rgba(234,88,12,.3);}
+    .tag-sc{background:rgba(124,58,237,.2);color:#a78bfa;border:1px solid rgba(124,58,237,.3);}
+    .choice-title{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1.3rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
+    .choice-desc{font-size:.84rem;color:var(--gray-mid);line-height:1.5;}
+    .hh-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:20px;}
+    .hh-card{background:var(--navy-mid);border:2px solid rgba(255,255,255,.07);border-radius:10px;padding:24px 20px;text-align:center;cursor:pointer;transition:all .2s;}
+    .hh-card:hover:not(.locked){border-color:var(--red);background:var(--navy-light);transform:translateY(-3px);box-shadow:0 10px 30px rgba(217,28,42,.2);}
+    .hh-card.locked{opacity:.45;cursor:not-allowed;}
+    .hh-card img{width:100%;max-width:170px;height:120px;object-fit:contain;margin-bottom:14px;}
+    .hh-name{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.1rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+    .hh-id{font-size:.8rem;color:var(--gold);font-weight:600;letter-spacing:1px;text-transform:uppercase;}
+    .hh-desc{font-size:.82rem;color:var(--gray-mid);margin-top:10px;line-height:1.5;}
+    .hh-locked-msg{font-size:.78rem;color:#f87171;margin-top:8px;font-weight:600;}
+    .download-hero{background:linear-gradient(135deg,var(--navy-mid),var(--navy-light));border:2px solid var(--red);border-radius:12px;padding:32px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;}
+    .download-hero-info h2{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1.7rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+    .selection-pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+    .pill{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:4px 12px;font-size:.78rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--gold);}
+    .download-btn{display:inline-flex;align-items:center;gap:10px;background:var(--red);color:#fff;text-decoration:none;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1.2rem;letter-spacing:2px;text-transform:uppercase;padding:16px 32px;border-radius:6px;transition:all .2s;border:none;cursor:pointer;white-space:nowrap;}
+    .download-btn:hover{background:var(--red-bright);transform:translateY(-2px);box-shadow:0 8px 24px rgba(217,28,42,.4);}
+    .download-btn.disabled{opacity:.45;pointer-events:none;}
+    .no-link-box{background:rgba(240,165,0,.1);border:1px solid var(--gold);border-radius:6px;padding:12px 16px;font-size:.85rem;color:var(--gold);margin-bottom:16px;display:none;}
+    .notice{border-left:4px solid;border-radius:0 8px 8px 0;padding:14px 18px;margin-bottom:14px;}
+    .notice.gold{background:rgba(240,165,0,.1);border-color:var(--gold);}
+    .notice.orange{background:rgba(234,88,12,.1);border-color:var(--orange);}
+    .notice .notice-title{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:.82rem;letter-spacing:2px;text-transform:uppercase;margin-bottom:5px;}
+    .notice.gold .notice-title{color:var(--gold);}
+    .notice.orange .notice-title{color:#fb923c;}
+    .notice p{font-size:.84rem;color:#c8d0de;line-height:1.5;}
+    .notice a{color:#fb923c;}
+    .section-divider{display:flex;align-items:center;gap:16px;margin:36px 0 24px;}
+    .section-divider .divider-label{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.3rem;text-transform:uppercase;letter-spacing:2px;white-space:nowrap;}
+    .section-divider .divider-line{flex:1;height:2px;background:linear-gradient(to right,var(--red),transparent);}
+    .instruction-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;margin-bottom:32px;}
+    .instruction-card{background:var(--navy-mid);border:1px solid rgba(255,255,255,.07);border-radius:10px;overflow:hidden;}
+    .inst-header{background:var(--navy-light);padding:14px 18px;display:flex;align-items:center;gap:12px;border-bottom:2px solid var(--red);}
+    .inst-num{width:32px;height:32px;background:var(--red);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1rem;flex-shrink:0;}
+    .inst-title{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1rem;text-transform:uppercase;letter-spacing:1px;}
+    .inst-body{padding:18px;}
+    .inst-body ol{padding-left:18px;}
+    .inst-body li{font-size:.88rem;color:#c8d0de;line-height:1.6;margin-bottom:6px;}
+    .inst-body li strong{color:var(--white);}
+    .video-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px;}
+    .video-card{background:var(--navy-mid);border:1px solid rgba(255,255,255,.07);border-radius:10px;overflow:hidden;}
+    .video-label{padding:12px 16px;background:var(--navy-light);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.9rem;text-transform:uppercase;letter-spacing:1px;color:var(--gold);border-bottom:2px solid var(--red);}
+    .video-embed{position:relative;padding-bottom:56.25%;height:0;}
+    .video-embed iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none;}
+    .beta-box{background:rgba(124,58,237,.08);border:2px solid rgba(124,58,237,.3);border-radius:10px;padding:24px;margin-top:48px;}
+    .beta-box-header{display:flex;align-items:center;justify-content:space-between;cursor:pointer;margin-bottom:0;}
+    .beta-box-title{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1.3rem;text-transform:uppercase;letter-spacing:2px;color:#a78bfa;}
+    .beta-toggle-btn{font-size:.8rem;color:var(--gray-mid);cursor:pointer;}
+    .beta-disclaimer{background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.3);border-radius:6px;padding:12px 16px;font-size:.83rem;color:#c4b5fd;line-height:1.5;margin-top:14px;}
+    .beta-disclaimer strong{color:var(--white);}
+    .beta-content{display:none;margin-top:14px;}
+    .beta-content.open{display:block;}
+    .beta-placeholder{font-size:.85rem;color:var(--gray-mid);font-style:italic;}
+    .back-btn{display:inline-flex;align-items:center;gap:6px;background:transparent;color:var(--gray-mid);border:1px solid rgba(255,255,255,.12);border-radius:5px;padding:8px 14px;font-family:'Barlow',sans-serif;font-size:.85rem;font-weight:600;cursor:pointer;transition:all .2s;margin-bottom:28px;}
+    .back-btn:hover{color:var(--white);border-color:rgba(255,255,255,.3);}
+    .support-bar{background:var(--navy-mid);border-top:2px solid rgba(255,255,255,.06);padding:24px;text-align:center;}
+    .support-bar p{color:var(--gray-mid);font-size:.9rem;}
+    .support-bar a{color:var(--red);font-weight:600;text-decoration:none;}
+    .support-bar .hours{font-size:.8rem;margin-top:4px;}
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500;align-items:center;justify-content:center;padding:24px;}
+    .modal-overlay.open{display:flex;}
+    .modal-box{background:var(--navy-mid);border:2px solid var(--orange);border-radius:12px;max-width:580px;width:100%;padding:32px;position:relative;}
+    .modal-close{position:absolute;top:12px;right:16px;background:none;border:none;color:var(--gray-mid);font-size:1.4rem;cursor:pointer;}
+    .modal-title{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1.5rem;text-transform:uppercase;color:#fb923c;margin-bottom:16px;}
+    .modal-body p{font-size:.88rem;color:#c8d0de;line-height:1.6;margin-bottom:12px;}
+    .modal-body strong{color:var(--white);}
+    @media(max-width:600px){.step-heading{font-size:1.8rem;}.system-grid{grid-template-columns:repeat(2,1fr);}.hh-grid{grid-template-columns:1fr;}.choice-grid{grid-template-columns:1fr;}.download-hero{flex-direction:column;}.logo-img{height:36px;}}
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <img src="Images/fitech-logo.webp" alt="FiTech Fuel Injection" class="logo-img">
+    <div class="header-badge">Software Download Center</div>
+  </div>
+</header>
+
+<div class="alert-banner">
+  <p>⚠️ <strong>Important:</strong> New 32-bit LS ECUs began shipping October 2025 and are <strong>NOT backwards compatible</strong> with older handheld software. If your LS ECU was sold or replaced after August 20, 2025, select <strong>"LS System (New 32-bit ECU)"</strong> below. &nbsp;<a href="#" onclick="openTSBModal();return false;">How do I identify my ECU?</a></p>
+</div>
+
+<div class="progress-wrap">
+  <div class="progress-inner">
+    <div class="progress-step active" id="prog-1"><div class="step-num">1</div><div><div class="step-label">System</div><div class="step-detail" id="prog-1-detail"></div></div></div>
+    <div class="progress-step" id="prog-2"><div class="step-num">2</div><div><div class="step-label">Part #</div><div class="step-detail" id="prog-2-detail"></div></div></div>
+    <div class="progress-step" id="prog-3"><div class="step-num">3</div><div><div class="step-label">Options</div><div class="step-detail" id="prog-3-detail"></div></div></div>
+    <div class="progress-step" id="prog-4"><div class="step-num">4</div><div><div class="step-label">Handheld</div><div class="step-detail" id="prog-4-detail"></div></div></div>
+    <div class="progress-step" id="prog-5"><div class="step-num">5</div><div><div class="step-label">Download</div></div></div>
+  </div>
+</div>
+
+<main>
+  <div class="step-panel active" id="step-1">
+    <h1 class="step-heading">Select Your <span>System Type</span></h1>
+    <p class="step-sub">Choose the FiTech product family that matches your system.</p>
+    <div class="system-grid" id="system-grid"></div>
+  </div>
+
+  <div class="step-panel" id="step-2">
+    <button class="back-btn" onclick="goBack(1)">← Back to System Type</button>
+    <h1 class="step-heading">Select Your <span>Part Number</span></h1>
+    <p class="step-sub">Find your part number on the product box or unit label.</p>
+    <div id="software-note-box" class="software-note" style="display:none;"></div>
+    <div class="part-grid" id="part-grid"></div>
+  </div>
+
+  <div class="step-panel" id="step-3">
+    <button class="back-btn" onclick="goBack(2)">← Back to Part Numbers</button>
+    <h1 class="step-heading" id="step3-title">Additional <span>Options</span></h1>
+    <p class="step-sub" id="step3-sub">Please answer the following to get the correct software.</p>
+    <div class="choice-grid" id="choice-grid"></div>
+  </div>
+
+  <div class="step-panel" id="step-4">
+    <button class="back-btn" id="btn-back-4" onclick="handleBack4()">← Back</button>
+    <h1 class="step-heading">Identify Your <span>Handheld</span></h1>
+    <p class="step-sub">Select the exact style of your handheld controller.</p>
+    <div class="hh-grid" id="hh-grid"></div>
+  </div>
+
+  <div class="step-panel" id="step-5">
+    <button class="back-btn" onclick="goBack(4)">← Back to Handheld</button>
+    <h1 class="step-heading">Your <span>Software Download</span></h1>
+
+    <div class="download-hero">
+      <div class="download-hero-info">
+        <h2 id="dl-title">Software Ready</h2>
+        <div class="selection-pills" id="dl-pills"></div>
+      </div>
+      <a class="download-btn" id="dl-btn" href="#" target="_blank">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download Software
+      </a>
+    </div>
+    <div class="no-link-box" id="no-link-box">⚠ Download link not yet configured. Please contact FiTech support at <strong>(951) 340-2624</strong>.</div>
+
+    <div id="dl-notices"></div>
+
+    <div class="section-divider"><span class="divider-label">Installation Instructions</span><div class="divider-line"></div></div>
+    <div class="instruction-grid" id="instruction-grid"></div>
+
+    <div class="section-divider"><span class="divider-label">Video Guides</span><div class="divider-line"></div></div>
+    <div class="video-grid" id="video-grid"></div>
+
+    <div class="beta-box" id="beta-box" style="display:none;">
+      <div class="beta-box-header" onclick="toggleBeta()">
+        <div class="beta-box-title">🧪 Beta Software</div>
+        <div class="beta-toggle-btn" id="beta-toggle-lbl">▼ Show</div>
+      </div>
+      <div class="beta-disclaimer"><strong>⚠ Use at your own risk.</strong> Beta software has not been fully tested and is provided for advanced users only. FiTech does not provide support for issues arising from beta software. Always back up your current calibration before installing.</div>
+      <div class="beta-content" id="beta-content">
+        <div class="beta-placeholder" id="beta-placeholder">No beta software is currently available for this system combination.</div>
+        <div id="beta-links"></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div class="modal-overlay" id="tsb-modal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeTSBModal()">✕</button>
+    <div class="modal-title">⚠ 32-Bit LS ECU Identification</div>
+    <div class="modal-body">
+      <p>New <strong>32-bit LS ECUs</strong> began shipping for new systems and replacement/warranty cases after <strong>August 20, 2025</strong>.</p>
+      <p><strong>How to identify:</strong> 32-bit ECUs have a <strong>date code and serial number laser etched on the main connector</strong>. See TSB #0006 for detailed identification photos.</p>
+      <p><strong>Compatibility:</strong> The 32-bit ECU requires a <strong>2-Dot handheld running software v1.79 or newer</strong>. It is NOT compatible with older handhelds or older software. Using old software with a 32-bit ECU will result in wrong dashboard readings and "ECU No Response" errors.</p>
+      <p style="color:#f87171;">If you are unsure which ECU you have, contact FiTech support at <strong>(951) 340-2624</strong> before proceeding.</p>
+    </div>
+  </div>
+</div>
+
+<div class="support-bar">
+  <p>Need help? Contact FiTech Technical Support: <a href="tel:9513402624">(951) 340-2624</a> &nbsp;|&nbsp; <a href="mailto:techmail@fitechefi.com">techmail@fitechefi.com</a></p>
+  <p class="hours" style="color:var(--gray-mid);font-size:.8rem;margin-top:4px;">Mon–Fri 7:00am–5:00pm PST &nbsp;|&nbsp; Saturday 8:00am–12:00pm PST</p>
+</div>
+
+<script>
+const DEFAULT_LINKS={
+  "30001-old-arrow":"https://www.dropbox.com/scl/fi/w5oa523dwpvzzsvey72eg/30002.30001-T210-OLD-ARROW-Handheld.rar?rlkey=ruoo5nw7c0hp9m9jujxxdnq51&dl=1",
+  "30001-old-noarrow":"https://www.dropbox.com/scl/fi/tc75kgm7tggjz2gj9t6br/30002.30001-T210-NO-ARROW-Handheld.rar?rlkey=dstdy7bdqkg63drnydt0oz9z0&dl=1",
+  "30001-new-nodot":"https://www.dropbox.com/scl/fi/emjrxqc8a4irb219g6dwp/New-HH-30001.30002-T210-v1.34-NoDot.rar?rlkey=m58vr0c3jalfpxx8m56c4mtpu&dl=1",
+  "30001-new-2dot":"https://www.dropbox.com/scl/fi/4shf576rlimyd58v96s5h/30001.30002-T210-v1.53-2DOT.zip?rlkey=tpc19pthmwoljplr4x6f6vh9y&dl=1",
+  "30002-old-arrow":"https://www.dropbox.com/scl/fi/w5oa523dwpvzzsvey72eg/30002.30001-T210-OLD-ARROW-Handheld.rar?rlkey=ruoo5nw7c0hp9m9jujxxdnq51&dl=1",
+  "30002-old-noarrow":"https://www.dropbox.com/scl/fi/tc75kgm7tggjz2gj9t6br/30002.30001-T210-NO-ARROW-Handheld.rar?rlkey=dstdy7bdqkg63drnydt0oz9z0&dl=1",
+  "30002-new-nodot":"https://www.dropbox.com/scl/fi/emjrxqc8a4irb219g6dwp/New-HH-30001.30002-T210-v1.34-NoDot.rar?rlkey=m58vr0c3jalfpxx8m56c4mtpu&dl=1",
+  "30002-new-2dot":"https://www.dropbox.com/scl/fi/4shf576rlimyd58v96s5h/30001.30002-T210-v1.53-2DOT.zip?rlkey=tpc19pthmwoljplr4x6f6vh9y&dl=1",
+  "30003-old-arrow":"https://www.dropbox.com/scl/fi/5s5c5qfjbvvw5vp24ft7x/30003-T210-OLD-ARROW-Handheld.rar?rlkey=8cc0au8eihzpbzvsg9oedqq0w&dl=1",
+  "30003-old-noarrow":"https://www.dropbox.com/scl/fi/rh1eckxadgtr32mq4iab3/30003-T210-NO-ARROW-Handheld.rar?rlkey=ekibhhrk4m74nx2ocwdaaebvi&dl=1",
+  "30003-new-nodot":"https://www.dropbox.com/scl/fi/pdevvua0v27yrher9ru60/New-hh-30003-T1210-v1.34-NoDOT.rar?rlkey=8xm44414zmb4u5tqdgutnxk2a&dl=1",
+  "30003-new-2dot":"https://www.dropbox.com/scl/fi/sb02u4vi1ii2nl6he6516/30003-T210-v1.53.zip?rlkey=odju5mr7xs7lgn8q33wpio8qy&dl=1",
+  "30004-old-arrow":"https://www.dropbox.com/scl/fi/kwe89jlnx5oclghe4xokp/OLD-HH-30004-T210-OldARROW.rar?rlkey=iyox4uxjbvou0jxqme886ahqb&dl=1",
+  "30004-old-noarrow":"https://www.dropbox.com/scl/fi/hw7f5cjamarhaj9b4bhtg/30004-T210-No-Arrows.rar?rlkey=f7cxjzorxayxvf3yz1hm3oid3&dl=1",
+  "30004-new-nodot":"https://www.dropbox.com/scl/fi/w9mskgzejarc76ij6gvg4/New-HH-30004-T210-v1.34-NoDot.rar?rlkey=ja4h79sz5uj7jel2i5bo8fizs&dl=1",
+  "30004-new-2dot":"https://www.dropbox.com/scl/fi/36p6eulk2w671tip1pcgo/V8_30004-T210-V1.53-2Dot.zip?rlkey=tw76rxee4owtzj5p21csx0y6l&dl=1",
+  "30005-old-arrow":"https://www.dropbox.com/scl/fi/2a24xebm31q7boe1q40rf/30005-T210-OLD-ARROW-Handheld.rar?rlkey=hyvtv7zldx03vezys2htkzvd5&dl=1",
+  "30005-old-noarrow":"#","30005-new-nodot":"https://www.dropbox.com/scl/fi/vkwj5cdkqgyfbxiqybecv/New-HH-30005-v.1.34-NoDOT.zip?rlkey=8ilh301z6s9p8iemb3ubs3ihi&dl=1",
+  "30005-new-2dot":"https://www.dropbox.com/scl/fi/9hw8p3wbgtf2vbrex00md/30005-T210-v1.49-2DOT.zip?rlkey=r80oys7yk7sw68gt0tnxkhomo&dl=1",
+  "30008-old-arrow":"https://www.dropbox.com/scl/fi/gzuk7baj8ag7r2vr706vl/30008-T210-OLD-ARROW-Handheld.rar?rlkey=scjmxn515apikcvluzzwrjwps&dl=1",
+  "30008-old-noarrow":"https://www.dropbox.com/scl/fi/xv9zkapydr14p4815ceh4/30008-T210-OLD-NO_ARROW-Handheld.rar?rlkey=vvlcv9zqm44jccs336wf233vv&dl=1",
+  "30008-new-nodot":"https://www.dropbox.com/scl/fi/6wa06zd9vl1rh4naibmyf/New-HH-30008-T210-v1.34-NoDOT.zip?rlkey=uvnonf9e2ywf7ca3e5z6r3swo&dl=1",
+  "30008-new-2dot":"https://www.dropbox.com/scl/fi/0p5y94vdgl78courxokcq/30008-T210-v1.49-2DOT.zip?rlkey=15yl0z7fm21iz026y6er345p6&dl=1",
+  "30012-old-arrow":"https://www.dropbox.com/scl/fi/j6i843e5egowh8bqty543/Old-HH-30012-T210-OldARROW.rar?rlkey=v9izhfjgcifh6c0ogc9p64uc9&dl=1",
+  "30012-old-noarrow":"https://www.dropbox.com/scl/fi/qe3vgb2p27sho2k2v4uex/30012-T210-Old-NO_ARROW.rar?rlkey=svoa5nfg1muythtmrol84dljv&dl=1",
+  "30012-new-nodot":"https://www.dropbox.com/scl/fi/qq3zlpzcjpjcxc9vow7fg/NewHH-30012-T210-1.34-NoDot.zip?rlkey=6w9d332topart2xg46iqezonn&dl=1",
+  "30012-new-2dot":"https://www.dropbox.com/scl/fo/e912xel8mpbl1o6b2pl8l/AByqc30ik2p0zu3Z5dO3KCc?rlkey=dw4kah0w6kh6ze06n78t1kxb5&dl=1",
+  "30020-old-arrow":"#","30020-old-noarrow":"#","30020-new-nodot":"#",
+  "30020-new-2dot":"https://www.dropbox.com/scl/fi/1v5nffw0baeq2lfq4ogro/30020-SR196j-v1.53.zip?rlkey=ixntm80y6w6muj275qmqhckzi&dl=1",
+  "30061-old-arrow":"https://www.dropbox.com/scl/fi/nbzfs9dfrmjr42xuwto81/30061_2-T210-Old-Handheld-Arrow.rar?rlkey=al01y4jh2dvdyf3fifvqqw15m&dl=1",
+  "30061-old-noarrow":"#",
+  "30061-new-nodot":"https://www.dropbox.com/scl/fi/ibgko8yckvfnqtyg8km2l/30061_2-T210-New-Handheld-noDOT-v.1.34-1.rar?rlkey=k71l49czd3jt3enot6o0m5plr&dl=1",
+  "30061-new-2dot":"https://www.dropbox.com/scl/fi/r5mzn8q7b2yd50byp7xpz/30061_2-T210-v1.53.zip?rlkey=s1p6gj8seu2mqt0xdyyah64ui&dl=1",
+  "30064-old-arrow":"#","30064-old-noarrow":"#",
+  "30064-new-nodot":"https://www.dropbox.com/scl/fi/qye2vnkdd9u279rzp85le/30064-T210-new-Handheld-noDOT-v1.34-1.rar?rlkey=targ4a838q9h4ovqfkluzpfzc&dl=1",
+  "30064-new-2dot":"https://www.dropbox.com/scl/fi/3iqaiotcuh4rys6chn4vj/30064-T210-v1.53.zip?rlkey=l549fz57azna3gyvq6pyojlcl&dl=1",
+  "39001-old-arrow":"https://www.dropbox.com/scl/fi/2zi9cm5hbxxpr10jje2hr/39001-TWO-BBL-T210-OLD-ARROW-Handheld.rar?rlkey=xn2a07m4q68dtu365dfyei0l6&dl=1",
+  "39001-old-noarrow":"#",
+  "39001-new-nodot":"https://www.dropbox.com/scl/fi/wntfytopaz05u78fittjd/New-HH-39001-Two-Barrel-400hp-T210-v1.34-No-DOT.zip?rlkey=00sqjbiafqc7mwv5pj60tttms&dl=1",
+  "39001-new-2dot":"https://www.dropbox.com/scl/fi/sj6e3selx1gne4n1qpzj0/39001-2Barrel-400hp-NoPWM-T210-v1.49-2DOT.zip?rlkey=srfs1mlio194r3exwkkgf55iu&dl=1",
+  "39610-old-arrow":"#","39610-old-noarrow":"#","39610-new-nodot":"#",
+  "39610-new-2dot":"https://www.dropbox.com/scl/fi/ml1h3cq414m3h5ci4a48e/39610-2-DOT-1.53.zip?rlkey=ku2qadt93d1wj9ohcu4ecsnyj&dl=1",
+  "70050-NA-old-arrow":"https://www.dropbox.com/scl/fi/j6y33j1gpglgiyu1cbri2/70050-T538-NA-Old-HH-ARROW.rar?rlkey=ee6re6vwwnxsv8glyb1mvhl4k&dl=1",
+  "70050-NA-old-noarrow":"https://www.dropbox.com/scl/fi/u3bmwk7bxm865cqx40foj/70050-T538-NA-Old-HH-No_Arrow.rar?rlkey=r7b5c2pke2u3emknhfef84x5o&dl=1",
+  "70050-NA-new-nodot":"https://www.dropbox.com/scl/fi/m7xp6zuuj3o7e6ffsdlta/70050-T538-NA-newHH-No-DOT-v1.34.rar?rlkey=6gtv2f1194lqr42jd1q5cqedw&dl=1",
+  "70050-NA-new-2dot":"https://www.dropbox.com/scl/fo/6vwvzbk54tya7glex8dx7/ADzK5Ixk3RL9o1h7RG27X1o?rlkey=clwdlt6f6b7ghcp0jazyit8q9&dl=1",
+  "70050-SC-old-arrow":"#","70050-SC-old-noarrow":"#","70050-SC-new-nodot":"#",
+  "70050-SC-new-2dot":"https://www.dropbox.com/scl/fi/wm0fd2852r1jhusaskong/70050-T541-SC-v1.53.zip?rlkey=stdfqoov3gji7j5m2dzu28tvx&dl=1",
+  "70050-32bit-new-2dot":"https://www.dropbox.com/scl/fi/3mep9m1zqvg5ux7iv1yl2/LS32bit-T671-v1.79.zip?rlkey=bm6pk19wyisl49g80w6kwbo2n&dl=1",
+  "38350-old-style":"https://www.dropbox.com/scl/fi/q3bf49nyzlj21mpprs9pw/Handheld-T672-TPI-38350-1_79.rar?rlkey=bmlmbmhwiounvmba11gs8loo2&dl=1",
+  "38350-new-2dot":"https://www.dropbox.com/scl/fi/fm7jf4wrnp1ylj4fnh49s/TPI-T541A-v1.53.zip?rlkey=mr1d41q5c13qrq9iwkl40gn9c&dl=1",
+  "38301-new-2dot":"https://www.dropbox.com/scl/fi/iar92dpxeekern7ldupdw/38301-T197E-v1.53.zip?rlkey=sk137lma6smx08j7qqm2fxr6j&dl=1",
+  "38301-old-arrow":"#","38301-old-noarrow":"#","38301-new-nodot":"#",
+  "30070-new-2dot":"https://www.dropbox.com/scl/fi/xgkxe7nn1y59mgy0ex91y/30070-NEMESIS-T671-v1.79.rar?rlkey=by0kgubtya8qo2mcl153b56sb&dl=1",
+  "30070-old-arrow":"#","30070-old-noarrow":"#","30070-new-nodot":"#",
+  "30014-old-arrow":"https://www.dropbox.com/scl/fi/uyhdg4h67oldkwelestol/30014-old-Handheld-Arrow-T210-1.rar?rlkey=uvc60e559tbsnka83nci93iex&dl=1",
+  "30014-old-noarrow":"#","30014-new-nodot":"#",
+  "30014-new-2dot":"https://www.dropbox.com/scl/fi/m57dw3o4fqub8qrxs26op/30014-T210-v1.53.zip?rlkey=gaq173ff6ncmfvbiekgicfef7&dl=1",
+  "20010-16bit-new-2dot":"https://www.dropbox.com/scl/fo/brmt1rmro5o47yrffiu9a/AGl4JGrT7dPO2N3xLW1Ivxc?rlkey=8ssmzz0s876q1td909g15x8ig&dl=1",
+  "20010-32bit-new-2dot":"https://www.dropbox.com/scl/fi/kq2j1l786s80vb36y8b32/20010-32bit-v1.61.zip?rlkey=obb5kpywz0qtwh7mhnekcycc8&dl=1",
+  "20010-old-arrow":"#","20010-old-noarrow":"#","20010-new-nodot":"#",
+  "20011-new-2dot":"https://www.dropbox.com/scl/fo/y95orm989egzj0fy17top/AEzes1f_cEN22uOL049iBUg?rlkey=3jvsfo565eo3ewafizrmshd76&dl=1",
+  "20011-old-arrow":"#","20011-old-noarrow":"#","20011-new-nodot":"#",
+  "20012-old-arrow":"#","20012-old-noarrow":"#","20012-new-nodot":"#","20012-new-2dot":"#",
+};
+const DEFAULT_VIDEOS={ecu:"https://www.youtube.com/embed/k_pQY21HY8g",handheld:"https://www.youtube.com/embed/JaAPfsIcOmE"};
+function getLinks(){try{const s=localStorage.getItem("fitech_links");return s?Object.assign({},DEFAULT_LINKS,JSON.parse(s)):DEFAULT_LINKS;}catch(e){return DEFAULT_LINKS;}}
+function getVideos(){try{const s=localStorage.getItem("fitech_videos");return s?Object.assign({},DEFAULT_VIDEOS,JSON.parse(s)):DEFAULT_VIDEOS;}catch(e){return DEFAULT_VIDEOS;}}
+
+const HANDHELDS={
+  "old-arrow":{id:"old-arrow",name:"Old Arrow Style",img:"Images/old-hh-arrows.gif",badge:"Arrow Joystick — Plugs in from TOP",desc:"Original joystick with white arrow keys around it. Cable connects at the top."},
+  "old-noarrow":{id:"old-noarrow",name:"Old No-Arrow",img:"Images/old-hh-no-arrows.gif",badge:"Older button-style — No arrow joystick",desc:"Older handheld with directional buttons but no arrow joystick. No dots on the side."},
+  "new-nodot":{id:"new-nodot",name:"New Style – No Dot",img:"Images/new-hh-no-dot.gif",badge:"Plugs in from BOTTOM — No Dots",desc:"New style with OK button in center. Cable plugs into bottom. No dots on right edge."},
+  "new-2dot":{id:"new-2dot",name:"New Style – 2 Dot",img:"Images/new-hh-2-dot.gif",badge:"Plugs in from BOTTOM — 2 Dots on side",desc:"Same as No-Dot but has two small dots visible on the right edge next to the buttons."},
+};
+
+const SYSTEMS=[
+  {id:"tb",name:"Throttle Body",img:"Images/30002_1.webp",flow:"standard",showBaro:true,
+   parts:[{num:"30001",desc:"Go EFI 4 – 600 HP"},{num:"30002",desc:"Go EFI 4 – 600 HP"},{num:"30003",desc:"Go EFI 4 – 600 HP"},{num:"30004",desc:"Go EFI 8 – 800 HP"},{num:"30005",desc:"Go EFI 8 – 800 HP"},{num:"30008",desc:"Go EFI 8 – 800 HP"},{num:"30012",desc:"Go EFI Master/Slave"},{num:"30020",desc:"Go EFI in a Box"},{num:"30061",desc:"Go EFI Power Adder"},{num:"30064",desc:"Go EFI Power Adder"},{num:"39001",desc:"Go EFI 2-Barrel 400HP"},{num:"39610",desc:"Go EFI Tri-Power 600HP"}]},
+  {id:"ls16",name:"LS System",img:"Images/LS.webp",flow:"ls",showBaro:false,skipParts:true,
+   sharedNote:"All LS systems use the same software regardless of part number."},
+  {id:"ls32",name:"LS System",img:"Images/LS.webp",flow:"ls32",showBaro:false,skipParts:true,cardBadge:"NEW — 32-bit ECU (Oct 2025+)",
+   sharedNote:"32-bit LS ECUs shipped after August 20, 2025. Only the 2-Dot handheld with software v1.79+ is compatible."},
+  {id:"dbw",name:"Drive By Wire",img:"Images/DBW.webp",flow:"dbw",showBaro:false,skipParts:true,cardBadge:"2-Dot Handheld Only",
+   sharedNote:"All Drive By Wire (DBW) systems use the same 32-bit software. The 2-Dot handheld is required."},
+  {id:"tpi",name:"TPI System",img:"Images/TPI.webp",flow:"tpi",showBaro:false,
+   sharedNote:"All TPI part numbers use the same software — select any to continue.",
+   parts:[{num:"38300",desc:"TPI System"},{num:"38301",desc:"TPI System"},{num:"38302",desc:"TPI System"},{num:"38303",desc:"TPI System"}]},
+  {id:"ultraram",name:"Ultra Ram",img:"Images/Ultra_Ram.webp",flow:"standard",showBaro:false,sharedSid:"38301",
+   sharedNote:"All Ultra Ram systems use the same software file (38301).",
+   parts:[{num:"30008",desc:"Ultra Ram 500 HP"},{num:"30009",desc:"Ultra Ram 750 HP"}]},
+  {id:"ultraport",name:"Ultra Port",img:"Images/Ultra_Port.webp",flow:"standard",showBaro:false,
+   parts:[{num:"30010",desc:"Ultra Port 500 HP"},{num:"30011",desc:"Ultra Port 750 HP"}]},
+  {id:"goport",name:"Go Port",img:"Images/Go_Port.webp",flow:"standard",showBaro:false,sharedSid:"30014",
+   sharedNote:"All Go Port systems use the same software file (30014).",
+   parts:[{num:"30013",desc:"Go Port EFI"},{num:"30014",desc:"Go Port EFI"},{num:"30015",desc:"Go Port EFI"}]},
+  {id:"goshift",name:"Go Shift",img:"Images/Go_Shift.webp",flow:"goshift",showBaro:false,
+   parts:[{num:"20010",desc:"Go Shift Trans Controller"},{num:"20011",desc:"Go Shift Trans Controller"},{num:"20012",desc:"Go Shift Trans Controller"}]},
+  {id:"nemesis",name:"Nemesis",img:"Images/Nemesis.webp",flow:"standard",showBaro:false,sharedSid:"30070",
+   sharedNote:"All Nemesis systems use the same software file (30070).",
+   parts:[{num:"30070",desc:"Nemesis EFI"},{num:"30071",desc:"Nemesis EFI"}]},
+  {id:"procal",name:"ProCal Laptop Software",img:"Images/ProCal.jpg",flow:"procal",showBaro:false,skipParts:true,cardBadge:"Laptop Tuning Software"},
+];
+
+let S={system:null,part:null,sub:null,hh:null};
+
+function buildSystemGrid(){
+  const g=document.getElementById("system-grid");
+  SYSTEMS.forEach(sys=>{
+    const c=document.createElement("div");c.className="system-card";
+    c.innerHTML=`<img src="${sys.img}" alt="${sys.name}"><div class="card-name">${sys.name}</div>${sys.cardBadge?`<div class="card-badge badge-new">${sys.cardBadge}</div>`:""}`;
+    c.onclick=()=>selectSystem(sys);g.appendChild(c);
+  });
+}
+
+function selectSystem(sys){
+  S={system:sys,part:{num:"N/A"},sub:null,hh:null};
+  document.getElementById("prog-1-detail").textContent=sys.name+(sys.cardBadge?" (32-bit)":"");
+
+  // LS and DBW skip the part number step entirely
+  if(sys.skipParts){
+    document.getElementById("prog-2-detail").textContent="All Models";
+    const f=sys.flow;
+    if(f==="ls"){buildLSChoices();goToStep(3);}
+    else if(f==="ls32"){S.sub="32bit";document.getElementById("prog-3-detail").textContent="32-bit ECU";buildHHGrid("ls32");goToStep(4);}
+    else if(f==="dbw"){S.sub="dbw";document.getElementById("prog-3-detail").textContent="DBW";buildHHGrid("dbw");goToStep(4);}
+    else if(f==="procal"){window.location.href="procal.html";}
+    return;
+  }
+
+  const nb=document.getElementById("software-note-box");
+  if(sys.sharedNote){nb.style.display="block";nb.innerHTML=`ℹ️ <strong>Note:</strong> ${sys.sharedNote}`;}else nb.style.display="none";
+  const g=document.getElementById("part-grid");g.innerHTML="";
+  (sys.parts||[]).forEach(p=>{
+    const c=document.createElement("div");c.className="part-card";
+    c.innerHTML=`<div class="part-num">${p.num}</div><div class="part-desc">${p.desc||""}</div>`;
+    c.onclick=()=>selectPart(p);g.appendChild(c);
+  });
+  goToStep(2);
+}
+
+function selectPart(part){
+  S.part=part;
+  document.getElementById("prog-2-detail").textContent=part.num;
+  const f=S.system.flow;
+  if(f==="ls"){buildLSChoices();goToStep(3);}
+  else if(f==="ls32"){S.sub="32bit";document.getElementById("prog-3-detail").textContent="32-bit ECU";buildHHGrid("ls32");goToStep(4);}
+  else if(f==="goshift"){buildGoShiftChoices();goToStep(3);}
+  else if(f==="tpi"){buildTPIChoices();goToStep(3);}
+  else{S.sub=null;buildHHGrid("standard");goToStep(4);}
+}
+
+function buildLSChoices(){
+  document.getElementById("step3-title").innerHTML='NA or <span>Supercharged?</span>';
+  document.getElementById("step3-sub").textContent="Select the engine configuration that matches your system.";
+  const g=document.getElementById("choice-grid");g.innerHTML="";
+  [{key:"NA",icon:"🔧",tag:"tag-std",tagL:"Standard",title:"Naturally Aspirated",desc:"Standard LS without forced induction. Most common."},
+   {key:"SC",icon:"⚡",tag:"tag-sc",tagL:"Supercharged / Forced Induction",title:"Supercharged",desc:"LS with supercharger or turbocharger. Requires different calibration files."}
+  ].forEach(ch=>{
+    const c=document.createElement("div");c.className="choice-card";
+    c.innerHTML=`<div class="choice-icon">${ch.icon}</div><div class="choice-tag ${ch.tag}">${ch.tagL}</div><div class="choice-title">${ch.title}</div><div class="choice-desc">${ch.desc}</div>`;
+    c.onclick=()=>{S.sub=ch.key;document.getElementById("prog-3-detail").textContent=ch.title;buildHHGrid("ls-"+ch.key);goToStep(4);};
+    g.appendChild(c);
+  });
+}
+
+function buildGoShiftChoices(){
+  document.getElementById("step3-title").innerHTML='Standard or <span>New 32-bit ECU?</span>';
+  document.getElementById("step3-sub").textContent="Go Shift also has a new 32-bit version. Check your ECU connector for a laser-etched date code.";
+  const g=document.getElementById("choice-grid");g.innerHTML="";
+  [{key:"16bit",icon:"🔧",tag:"tag-std",tagL:"Original",title:"Standard (16-bit)",desc:"Original Go Shift ECU. No laser-etched date code.",cls:""},
+   {key:"32bit",icon:"⚡",tag:"tag-32b",tagL:"New — Oct 2025+",title:"New 32-bit ECU",desc:"Has laser-etched date code on connector. 2-Dot handheld only.",cls:" orange"}
+  ].forEach(ch=>{
+    const c=document.createElement("div");c.className="choice-card"+ch.cls;
+    c.innerHTML=`<div class="choice-icon">${ch.icon}</div><div class="choice-tag ${ch.tag}">${ch.tagL}</div><div class="choice-title">${ch.title}</div><div class="choice-desc">${ch.desc}</div>`;
+    c.onclick=()=>{S.sub=ch.key;document.getElementById("prog-3-detail").textContent=ch.title;buildHHGrid("goshift-"+ch.key);goToStep(4);};
+    g.appendChild(c);
+  });
+}
+
+function buildTPIChoices(){
+  document.getElementById("step3-title").innerHTML='TPI <span>Software Version</span>';
+  document.getElementById("step3-sub").textContent="TPI has both a standard and a newer 32-bit version. The 32-bit version requires a 2-Dot handheld.";
+  const g=document.getElementById("choice-grid");g.innerHTML="";
+  [{key:"16bit",icon:"🔧",tag:"tag-std",tagL:"All Handhelds",title:"Standard Software",desc:"Works with all handheld types including old arrow, no-arrow, no-dot, and 2-dot.",cls:""},
+   {key:"32bit",icon:"⚡",tag:"tag-32b",tagL:"2-Dot Only",title:"32-bit Software (v1.53)",desc:"Newer 32-bit TPI software. Requires 2-Dot handheld. See LS 32-bit TSB for compatibility details.",cls:" orange"}
+  ].forEach(ch=>{
+    const c=document.createElement("div");c.className="choice-card"+ch.cls;
+    c.innerHTML=`<div class="choice-icon">${ch.icon}</div><div class="choice-tag ${ch.tag}">${ch.tagL}</div><div class="choice-title">${ch.title}</div><div class="choice-desc">${ch.desc}</div>`;
+    c.onclick=()=>{S.sub=ch.key;document.getElementById("prog-3-detail").textContent=ch.title;buildHHGrid("tpi-"+ch.key);goToStep(4);};
+    g.appendChild(c);
+  });
+}
+
+function buildHHGrid(mode){
+  const g=document.getElementById("hh-grid");g.innerHTML="";
+  const lock32=["old-arrow","old-noarrow","new-nodot"];
+  const is32=(mode==="ls32"||mode==="dbw"||mode==="goshift-32bit"||mode==="tpi-32bit");
+  Object.values(HANDHELDS).forEach(hh=>{
+    const locked=is32&&lock32.includes(hh.id);
+    const c=document.createElement("div");c.className="hh-card"+(locked?" locked":"");
+    c.innerHTML=`<img src="${hh.img}" alt="${hh.name}"><div class="hh-name">${hh.name}</div><div class="hh-id">${hh.badge}</div><div class="hh-desc">${hh.desc}</div>${locked?`<div class="hh-locked-msg">⛔ 32-bit ECU requires the 2-Dot handheld with v1.79+ software. This handheld is NOT compatible.</div>`:""}`;
+    if(!locked)c.onclick=()=>selectHH(hh,mode);
+    g.appendChild(c);
+  });
+}
+
+function selectHH(hh,mode){
+  S.hh=hh;
+  document.getElementById("prog-4-detail").textContent=hh.name;
+  const {system,part,sub}=S;
+  const sid=system.sharedSid||part.num;
+  let key;
+  if(system.flow==="ls")key=`70050-${sub}-${hh.id}`;
+  else if(system.flow==="ls32")key=`70050-32bit-${hh.id}`;
+  else if(system.flow==="dbw")key=`70050-32bit-${hh.id}`;
+  else if(system.flow==="tpi"){
+    if(sub==="32bit")key="38350-new-2dot";
+    else key=(hh.id==="new-2dot")?"38350-new-2dot":"38350-old-style";
+  }
+  else if(system.flow==="goshift"){
+    if(sub==="16bit"&&hh.id==="new-2dot")key=`${part.num}-16bit-new-2dot`;
+    else if(sub==="32bit"&&hh.id==="new-2dot")key=`${part.num}-32bit-new-2dot`;
+    else key=`${part.num}-${hh.id}`;
+  }
+  else key=`${sid}-${hh.id}`;
+
+  const links=getLinks();const url=links[key]||"#";
+  let title=`${system.name} – ${system.skipParts?"All Models":"Part #"+part.num}`;
+  if(sub&&sub!=="dbw")title+=` (${sub==="NA"?"Naturally Aspirated":sub==="SC"?"Supercharged":sub})`;
+  document.getElementById("dl-title").textContent=title;
+  let pills=`<span class="pill">${system.name}</span>`;
+  if(!system.skipParts)pills+=`<span class="pill">Part #${part.num}</span>`;
+  if(sub&&sub!=="dbw"&&sub!=="32bit")pills+=`<span class="pill">${sub}</span>`;
+  if(sub==="32bit"||system.flow==="dbw")pills+=`<span class="pill">32-bit Software</span>`;
+  pills+=`<span class="pill">${hh.name}</span>`;
+  document.getElementById("dl-pills").innerHTML=pills;
+  const btn=document.getElementById("dl-btn");const nlb=document.getElementById("no-link-box");
+  if(!url||url==="#"){btn.className="download-btn disabled";btn.removeAttribute("href");nlb.style.display="block";}
+  else{btn.className="download-btn";btn.href=url;btn.target="_blank";nlb.style.display="none";}
+
+  const notices=document.getElementById("dl-notices");notices.innerHTML="";
+  if(system.showBaro)notices.innerHTML+=`<div class="notice gold"><div class="notice-title">⚠ Fault Code P0129 / Fault 13 (Baro Low)</div><p>If you see fault code <strong>P0129</strong> or fault <strong>13</strong> in the Dashboard after updating, go to <strong>Initial Setup → Engine Setup</strong>. Find <strong>Baro</strong> and turn it <strong>OFF</strong>. Send to ECU, then key off for 15 seconds.</p></div>`;
+  if(system.flow==="ls32"||system.flow==="dbw"||(sub==="32bit"&&system.flow!=="tpi"))notices.innerHTML+=`<div class="notice orange"><div class="notice-title">⚠ 32-bit ECU — 2-Dot Handheld Required</div><p>This software is for the new 32-bit ECU only. Your handheld must be the <strong>2-Dot model running v1.79+</strong>. This will <strong>NOT work</strong> on older 16-bit ECUs. See <a href="#" onclick="openTSBModal();return false;">TSB #0005</a>.</p></div>`;
+  if(system.flow==="tpi"&&sub==="32bit")notices.innerHTML+=`<div class="notice orange"><div class="notice-title">ℹ TPI 32-bit Software</div><p>This TPI version uses the same 32-bit platform as new LS systems. Refer to <a href="#" onclick="openTSBModal();return false;">LS 32-bit TSB #0005</a> for compatibility details. 2-Dot handheld required.</p></div>`;
+  if(sub==="SC")notices.innerHTML+=`<div class="notice gold"><div class="notice-title">ℹ Supercharged Calibration Selected</div><p>Confirm this matches your actual engine before writing to ECU. If unsure, contact FiTech support.</p></div>`;
+
+  const isOld=(hh.id==="old-arrow"||hh.id==="old-noarrow");
+  const ig=document.getElementById("instruction-grid");ig.innerHTML="";
+  getInstructions(isOld).forEach((inst,i)=>{
+    const c=document.createElement("div");c.className="instruction-card";
+    c.innerHTML=`<div class="inst-header"><div class="inst-num">${i+1}</div><div class="inst-title">${inst.title}</div></div><div class="inst-body"><ol>${inst.steps.map(s=>`<li>${s}</li>`).join("")}</ol></div>`;
+    ig.appendChild(c);
+  });
+
+  const vids=getVideos();
+  document.getElementById("video-grid").innerHTML=`<div class="video-card"><div class="video-label">🔧 Updating the ECU Software</div><div class="video-embed"><iframe src="${vids.ecu}" allowfullscreen></iframe></div></div><div class="video-card"><div class="video-label">🔧 Updating the Handheld Software</div><div class="video-embed"><iframe src="${vids.handheld}" allowfullscreen></iframe></div></div>`;
+
+  document.getElementById("beta-box").style.display="block";
+  document.getElementById("beta-content").classList.remove("open");
+  document.getElementById("beta-toggle-lbl").textContent="▼ Show";
+  goToStep(5);
+}
+
+function getInstructions(isOld){
+  if(isOld)return[
+    {title:"Enter USB Storage Mode",steps:["Plug the handheld into your computer using the supplied <strong>USB cable</strong>.","A menu will pop up <strong>automatically</strong> on the old-style handheld when plugged in.","Select <strong>Open USB Mass Storage</strong>.","The handheld will appear as a USB drive (typically D:) on your computer."]},
+    {title:"Replace Software Files",steps:["Open the handheld drive. <strong>Select all files</strong> and delete them (copy off first if you want a backup).","Extract the downloaded software using <strong>WinZip or WinRAR</strong> (free at winrar.com).","<strong>Copy all extracted files</strong> to the root of the handheld drive."]},
+    {title:"Reboot the Handheld",steps:["Once the copy is done, <strong>disconnect then reconnect</strong> the USB cable.","When the menu appears, <strong>click the joystick downward</strong> (scroll — do NOT push inward) and <strong>hold for about 5 seconds</strong>.","When you see the reboot screen, release and let it finish."]},
+    {title:"Update the ECU",steps:["Take the handheld to the vehicle. Plug in and turn key to <strong>ON</strong> — do not start engine.","Go to <strong>Display Setup</strong> and set <strong>ECU Programmer</strong> to <strong>Show</strong>.","Go to Main Menu → <strong>ECU Programmer</strong> → select the <strong>.hex file</strong> → press Enter on the joystick.","When download finishes, unplug handheld for 1 second then replug.","Open <strong>Write Cal to ECU</strong>, select the correct default calibration file, press <strong>Write to</strong>.","<strong>Key off for 30 seconds</strong>. Update complete — proceed to Initial Setup."]},
+  ];
+  return[
+    {title:"Enter USB Storage Mode",steps:["Plug the handheld into your computer using the supplied <strong>USB cable</strong> (plugs in from the bottom).","On the handheld, scroll to the bottom of the Main Menu and select <strong>Handheld Software Mode Selection</strong>.","Select <strong>Open USB Mass Storage</strong>. The handheld appears as a USB drive on your computer."]},
+    {title:"Replace Software Files",steps:["Open the handheld drive on your computer (usually D: or E:).","<strong>Select all files</strong> and delete them (copy off first if you want a backup).","Extract the downloaded software using <strong>WinZip or WinRAR</strong> (free at winrar.com).","<strong>Copy all extracted files</strong> to the root of the handheld drive."]},
+    {title:"Reboot & Update Handheld",steps:["Press <strong>OK</strong> on the handheld to return to the Main Menu.","Go to <strong>Display Setup</strong> and set <strong>Handheld Software Reboot</strong> to <strong>Show</strong>.","Return to Main Menu, find <strong>Handheld Software Reboot</strong>, and select it.","Choose the new .bin file and press <strong>Yes</strong>. <strong>Do not unplug</strong> during the update."]},
+    {title:"Update the ECU",steps:["Take the handheld to the vehicle. Plug in and turn key to <strong>ON</strong> — do not start engine.","Go to <strong>Display Setup</strong> → set <strong>ECU Programmer</strong> to <strong>Show</strong>.","Return to Main Menu → <strong>ECU Programmer</strong> → select the <strong>.hex file</strong> → press OK.","Press OK to begin. When done, unplug handheld for 1 second then replug.","Open <strong>Write Cal to ECU</strong>, select the correct default calibration, press <strong>Write to</strong>.","<strong>Key off for 30 seconds</strong>. Done — proceed to Initial Setup."]},
+  ];
+}
+
+function goToStep(n){
+  document.querySelectorAll(".step-panel").forEach(p=>p.classList.remove("active"));
+  document.getElementById("step-"+n).classList.add("active");
+  document.querySelectorAll(".progress-step").forEach((el,i)=>{
+    el.classList.remove("active","done");
+    if(i+1<n)el.classList.add("done");
+    if(i+1===n)el.classList.add("active");
+  });
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function handleBack4(){
+  const f=S.system?S.system.flow:"standard";
+  if(S.system&&S.system.skipParts){
+    // LS and DBW skipped part step — if they had a sub-choice (LS 16-bit NA/SC), go back to step 3; otherwise step 1
+    if(f==="ls")goBack(3);
+    else goBack(1);
+  } else if(["ls","goshift","tpi"].includes(f)){
+    goBack(3);
+  } else {
+    goBack(2);
+  }
+}
+
+function goBack(n){
+  if(n<=1){S={system:null,part:null,sub:null,hh:null};}
+  else if(n<=2){S.part=null;S.sub=null;S.hh=null;}
+  else if(n<=3){S.sub=null;S.hh=null;}
+  else if(n<=4){S.hh=null;}
+  goToStep(n);
+}
+
+function toggleBeta(){
+  const c=document.getElementById("beta-content");const l=document.getElementById("beta-toggle-lbl");
+  c.classList.toggle("open");l.textContent=c.classList.contains("open")?"▲ Hide":"▼ Show";
+}
+function openTSBModal(){document.getElementById("tsb-modal").classList.add("open");}
+function closeTSBModal(){document.getElementById("tsb-modal").classList.remove("open");}
+document.getElementById("tsb-modal").addEventListener("click",function(e){if(e.target===this)closeTSBModal();});
+
+buildSystemGrid();
+</script>
+</body>
+</html>
