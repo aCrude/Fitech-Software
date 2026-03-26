@@ -258,6 +258,12 @@ const DEFAULT_LINKS = {
   // ── Nemesis ──
   "30070-old-arrow":   "#", "30070-old-noarrow": "#", "30070-new-nodot": "#",
   "30070-new-2dot":    "https://www.dropbox.com/scl/fi/xgkxe7nn1y59mgy0ex91y/30070-NEMESIS-T671-v1.79.rar?rlkey=by0kgubtya8qo2mcl153b56sb&dl=1",
+  // -- BETA FILES --
+  "BETA-70050-NA-CTS-new-2dot":    "https://www.dropbox.com/scl/fi/8q1nvc30g1o62xvy1leth/70050-T541-NA-v1.53-CTS-ENABLED.zip?rlkey=g9fxo0i806axgjljnz8hi0yk8&dl=1",
+  "BETA-70050-NA-nitrous-new-2dot":"https://www.dropbox.com/scl/fi/hnakom82w1h9wsiombs2k/70050-T541-NA-v1.53-nitrous.zip?rlkey=cx6b1cdb3fscr77ov7ox6f1no&dl=1",
+  "BETA-70050-SC-CTS-new-2dot":    "https://www.dropbox.com/scl/fi/8n6dh7y0r8vyu21zkd53e/70050-T541-SC-v1.53-CTS-ENABLED.zip?rlkey=hmvcn1t1nsvgfjtlv0zdb2t94&dl=1",
+  "BETA-70050-SC-nitrous-new-2dot":"https://www.dropbox.com/scl/fi/i1k0bsmxap73opgg6sg7u/70050-T541-SC-v1.53-nitrous.zip?rlkey=64nstvvpyc0wrz3mugwogm5dc&dl=1",
+  "BETA-30020-new-2dot":           "https://www.dropbox.com/scl/fo/wu5cdf8udutrx7qedgowy/AGkg98jEgtUwwVPeJN87Jlw?rlkey=8zcuweg277544qewshli91jmx&dl=1",
 };
 
 const DEFAULT_VIDEOS = {
@@ -329,6 +335,15 @@ const SYSTEMS = [
       {label:"20010 32-bit", note:"2-Dot only", keys:["20010-32bit-new-2dot"], singleKey:true},
       {label:"20011",        keys:["20011-old-arrow","20011-old-noarrow","20011-new-nodot","20011-new-2dot"]},
       {label:"20012",        note:"Pending — no file yet", keys:["20012-old-arrow","20012-old-noarrow","20012-new-nodot","20012-new-2dot"]},
+    ]},
+  { id:"beta", name:"🧪 Beta Software", img:"Images/LS.webp",
+    note:"Beta files are shown in the collapsed beta section at the bottom of the download page. Only shown when the customer selects the matching system and 2-Dot handheld.",
+    rows:[
+      {label:"LS NA — CTS Enabled",  note:"LS 16-bit NA, 2-Dot only", keys:["BETA-70050-NA-CTS-new-2dot"],    singleKey:true},
+      {label:"LS NA — Nitrous",       note:"LS 16-bit NA, 2-Dot only", keys:["BETA-70050-NA-nitrous-new-2dot"],singleKey:true},
+      {label:"LS SC — CTS Enabled",  note:"LS 16-bit SC, 2-Dot only", keys:["BETA-70050-SC-CTS-new-2dot"],    singleKey:true},
+      {label:"LS SC — Nitrous",       note:"LS 16-bit SC, 2-Dot only", keys:["BETA-70050-SC-nitrous-new-2dot"],singleKey:true},
+      {label:"30020 Beta",            note:"Go EFI in a Box, 2-Dot only",keys:["BETA-30020-new-2dot"],          singleKey:true},
     ]},
   { id:"nemesis", name:"Nemesis (30070)", img:"Images/Nemesis.webp",
     note:"All Nemesis systems use the same file.",

@@ -303,6 +303,12 @@ const DEFAULT_LINKS={
   "20011-new-2dot":"https://www.dropbox.com/scl/fo/y95orm989egzj0fy17top/AEzes1f_cEN22uOL049iBUg?rlkey=3jvsfo565eo3ewafizrmshd76&dl=1",
   "20011-old-arrow":"#","20011-old-noarrow":"#","20011-new-nodot":"#",
   "20012-old-arrow":"#","20012-old-noarrow":"#","20012-new-nodot":"#","20012-new-2dot":"#",
+  // -- BETA FILES --
+  "BETA-70050-NA-CTS-new-2dot":    "https://www.dropbox.com/scl/fi/8q1nvc30g1o62xvy1leth/70050-T541-NA-v1.53-CTS-ENABLED.zip?rlkey=g9fxo0i806axgjljnz8hi0yk8&dl=1",
+  "BETA-70050-NA-nitrous-new-2dot":"https://www.dropbox.com/scl/fi/hnakom82w1h9wsiombs2k/70050-T541-NA-v1.53-nitrous.zip?rlkey=cx6b1cdb3fscr77ov7ox6f1no&dl=1",
+  "BETA-70050-SC-CTS-new-2dot":    "https://www.dropbox.com/scl/fi/8n6dh7y0r8vyu21zkd53e/70050-T541-SC-v1.53-CTS-ENABLED.zip?rlkey=hmvcn1t1nsvgfjtlv0zdb2t94&dl=1",
+  "BETA-70050-SC-nitrous-new-2dot":"https://www.dropbox.com/scl/fi/i1k0bsmxap73opgg6sg7u/70050-T541-SC-v1.53-nitrous.zip?rlkey=64nstvvpyc0wrz3mugwogm5dc&dl=1",
+  "BETA-30020-new-2dot":           "https://www.dropbox.com/scl/fo/wu5cdf8udutrx7qedgowy/AGkg98jEgtUwwVPeJN87Jlw?rlkey=8zcuweg277544qewshli91jmx&dl=1",
 };
 const DEFAULT_VIDEOS={ecu:"https://www.youtube.com/embed/k_pQY21HY8g",handheld:"https://www.youtube.com/embed/JaAPfsIcOmE"};
 function getLinks(){try{const s=localStorage.getItem("fitech_links");return s?Object.assign({},DEFAULT_LINKS,JSON.parse(s)):DEFAULT_LINKS;}catch(e){return DEFAULT_LINKS;}}
@@ -497,10 +503,75 @@ function selectHH(hh,mode){
   const vids=getVideos();
   document.getElementById("video-grid").innerHTML=`<div class="video-card"><div class="video-label">🔧 Updating the ECU Software</div><div class="video-embed"><iframe src="${vids.ecu}" allowfullscreen></iframe></div></div><div class="video-card"><div class="video-label">🔧 Updating the Handheld Software</div><div class="video-embed"><iframe src="${vids.handheld}" allowfullscreen></iframe></div></div>`;
 
-  document.getElementById("beta-box").style.display="block";
-  document.getElementById("beta-content").classList.remove("open");
-  document.getElementById("beta-toggle-lbl").textContent="▼ Show";
+  // -- BETA SECTION --
+  buildBetaSection(system, part, sub, hh);
   goToStep(5);
+}
+
+function buildBetaSection(system, part, sub, hh){
+  const links = getLinks();
+  const betaBox = document.getElementById("beta-box");
+  const betaPlaceholder = document.getElementById("beta-placeholder");
+  const betaLinksEl = document.getElementById("beta-links");
+  const betaContent = document.getElementById("beta-content");
+
+  // Reset
+  betaContent.classList.remove("open");
+  document.getElementById("beta-toggle-lbl").textContent="▼ Show";
+  betaLinksEl.innerHTML = "";
+  betaPlaceholder.style.display = "block";
+
+  // Build list of applicable beta files for this selection
+  const betaFiles = [];
+
+  // LS 16-bit NA beta files
+  if(system.flow==="ls" && sub==="NA" && hh.id==="new-2dot"){
+    betaFiles.push(
+      {label:"LS NA — CTS Enabled (v1.53 Beta)", desc:"Includes Coolant Temperature Sensor corrections.", key:"BETA-70050-NA-CTS-new-2dot"},
+      {label:"LS NA — Nitrous (v1.53 Beta)",      desc:"Nitrous oxide tuning calibration.",               key:"BETA-70050-NA-nitrous-new-2dot"}
+    );
+  }
+  // LS 16-bit SC beta files
+  if(system.flow==="ls" && sub==="SC" && hh.id==="new-2dot"){
+    betaFiles.push(
+      {label:"LS SC — CTS Enabled (v1.53 Beta)", desc:"Supercharged with Coolant Temperature Sensor corrections.", key:"BETA-70050-SC-CTS-new-2dot"},
+      {label:"LS SC — Nitrous (v1.53 Beta)",      desc:"Supercharged nitrous oxide tuning calibration.",            key:"BETA-70050-SC-nitrous-new-2dot"}
+    );
+  }
+  // 30020 beta
+  if(system.flow==="standard" && part && part.num==="30020" && hh.id==="new-2dot"){
+    betaFiles.push(
+      {label:"30020 — Beta Software (v1.49 CTS)", desc:"Beta update for Go EFI in a Box systems.", key:"BETA-30020-new-2dot"}
+    );
+  }
+
+  if(betaFiles.length === 0){
+    betaBox.style.display = "block";
+    return;
+  }
+
+  // Build download buttons for each beta file
+  betaPlaceholder.style.display = "none";
+  betaFiles.forEach(bf => {
+    const url = links[bf.key] || "#";
+    const isAvail = url && url !== "#";
+    betaLinksEl.innerHTML += `
+      <div style="background:rgba(124,58,237,.08);border:1px solid rgba(124,58,237,.2);border-radius:8px;padding:16px 18px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+        <div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1rem;text-transform:uppercase;letter-spacing:1px;color:#c4b5fd;margin-bottom:3px;">${bf.label}</div>
+          <div style="font-size:.8rem;color:var(--gray-mid);">${bf.desc}</div>
+        </div>
+        ${isAvail
+          ? `<a href="${url}" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:rgba(124,58,237,.3);color:#e9d5ff;border:1px solid rgba(124,58,237,.5);text-decoration:none;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.95rem;letter-spacing:2px;text-transform:uppercase;padding:10px 20px;border-radius:5px;white-space:nowrap;transition:all .2s;" onmouseover="this.style.background='rgba(124,58,237,.5)'" onmouseout="this.style.background='rgba(124,58,237,.3)'">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Download Beta
+            </a>`
+          : `<span style="font-size:.8rem;color:var(--gray-mid);font-style:italic;">Link not configured</span>`
+        }
+      </div>`;
+  });
+
+  betaBox.style.display = "block";
 }
 
 function getInstructions(isOld){
