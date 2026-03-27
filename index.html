@@ -309,6 +309,7 @@ const DEFAULT_LINKS={
   "BETA-70050-SC-CTS-new-2dot":    "https://www.dropbox.com/scl/fi/8n6dh7y0r8vyu21zkd53e/70050-T541-SC-v1.53-CTS-ENABLED.zip?rlkey=hmvcn1t1nsvgfjtlv0zdb2t94&dl=1",
   "BETA-70050-SC-nitrous-new-2dot":"https://www.dropbox.com/scl/fi/i1k0bsmxap73opgg6sg7u/70050-T541-SC-v1.53-nitrous.zip?rlkey=64nstvvpyc0wrz3mugwogm5dc&dl=1",
   "BETA-30020-new-2dot":           "https://www.dropbox.com/scl/fo/wu5cdf8udutrx7qedgowy/AGkg98jEgtUwwVPeJN87Jlw?rlkey=8zcuweg277544qewshli91jmx&dl=1",
+  "BETA-70050-NA-IAT-correction-new-2dot": "https://www.dropbox.com/scl/fi/qx46pq3z2vsuvr95ls0ro/70050-T541-NA-500hp-New-2-DOT-v1.49-iat-correction.zip?rlkey=j2yxxn1d2vlmnkyembpclu364&dl=1",
 };
 const DEFAULT_VIDEOS={ecu:"https://www.youtube.com/embed/k_pQY21HY8g",handheld:"https://www.youtube.com/embed/JaAPfsIcOmE"};
 function getLinks(){try{const s=localStorage.getItem("fitech_links");return s?Object.assign({},DEFAULT_LINKS,JSON.parse(s)):DEFAULT_LINKS;}catch(e){return DEFAULT_LINKS;}}
@@ -574,7 +575,8 @@ function buildBetaSection(system, part, sub, hh){
   if(system.flow==="ls" && sub==="NA" && hh.id==="new-2dot"){
     betaFiles.push(
       {label:"LS NA — CTS Enabled (v1.53 Beta)", desc:"Includes Coolant Temperature Sensor corrections.", key:"BETA-70050-NA-CTS-new-2dot"},
-      {label:"LS NA — Nitrous (v1.53 Beta)",      desc:"Nitrous oxide tuning calibration.",               key:"BETA-70050-NA-nitrous-new-2dot"}
+      {label:"LS NA — Nitrous (v1.53 Beta)",      desc:"Nitrous oxide tuning calibration.",               key:"BETA-70050-NA-nitrous-new-2dot"},
+      {label:"LS NA - IAT Correction (v1.53 Beta)", desc:"IAT Correction", key: "BETA-70050-NA-IAT-correction-new-2dot"},
     );
   }
   // LS 16-bit SC beta files
