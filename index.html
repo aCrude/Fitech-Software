@@ -126,6 +126,22 @@
     .modal-title{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1.5rem;text-transform:uppercase;color:#fb923c;margin-bottom:16px;}
     .modal-body p{font-size:.88rem;color:#c8d0de;line-height:1.6;margin-bottom:12px;}
     .modal-body strong{color:var(--white);}
+    /* DISCLAIMER MODAL */
+    .disclaimer-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:600;align-items:center;justify-content:center;padding:24px;}
+    .disclaimer-overlay.open{display:flex;}
+    .disclaimer-box{background:var(--navy-mid);border:2px solid var(--red);border-radius:12px;max-width:620px;width:100%;padding:36px;position:relative;max-height:90vh;overflow-y:auto;}
+    .disclaimer-logo{height:40px;margin-bottom:20px;}
+    .disclaimer-title{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1.8rem;text-transform:uppercase;letter-spacing:1px;color:var(--white);margin-bottom:4px;}
+    .disclaimer-subtitle{font-size:.85rem;color:var(--gray-mid);margin-bottom:20px;}
+    .disclaimer-body{font-size:.85rem;color:#c8d0de;line-height:1.65;margin-bottom:20px;}
+    .disclaimer-body p{margin-bottom:12px;}
+    .disclaimer-body strong{color:var(--white);}
+    .disclaimer-body ul{padding-left:18px;margin-bottom:12px;}
+    .disclaimer-body ul li{margin-bottom:6px;}
+    .disclaimer-divider{height:1px;background:rgba(255,255,255,.08);margin:20px 0;}
+    .disclaimer-agree-btn{width:100%;padding:16px;background:var(--red);color:#fff;border:none;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1.2rem;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s;margin-bottom:10px;}
+    .disclaimer-agree-btn:hover{background:var(--red-bright);transform:translateY(-1px);box-shadow:0 6px 20px rgba(217,28,42,.4);}
+    .disclaimer-fine-print{font-size:.72rem;color:var(--gray-mid);text-align:center;line-height:1.5;}
     @media(max-width:600px){.step-heading{font-size:1.8rem;}.system-grid{grid-template-columns:repeat(2,1fr);}.hh-grid{grid-template-columns:1fr;}.choice-grid{grid-template-columns:1fr;}.download-hero{flex-direction:column;}.logo-img{height:36px;}}
   </style>
 </head>
@@ -219,6 +235,31 @@
   </div>
 </main>
 
+<!-- DISCLAIMER MODAL -->
+<div class="disclaimer-overlay open" id="disclaimer-modal">
+  <div class="disclaimer-box">
+    <img src="Images/fitech-logo.webp" alt="FiTech" class="disclaimer-logo">
+    <div class="disclaimer-title">Software Download Agreement</div>
+    <div class="disclaimer-subtitle">Please read and agree before continuing</div>
+    <div class="disclaimer-body">
+      <p>By downloading software from this page, you acknowledge and agree to the following:</p>
+      <ul>
+        <li>You are downloading software for use with a <strong>genuine FiTech EFI product</strong> only.</li>
+        <li>It is <strong>your responsibility</strong> to confirm the software is correct for your specific part number, ECU version, and handheld type before installation.</li>
+        <li>Improper installation or use of incorrect software may result in <strong>poor engine performance, damage to your vehicle, or voiding of your warranty</strong>.</li>
+        <li>Beta software is provided for advanced users only and has <strong>not been fully tested</strong>. Use beta files entirely at your own risk.</li>
+      </ul>
+      <div class="disclaimer-divider"></div>
+      <p><strong>FiTech EFI is not responsible</strong> for any damage, loss, or injury resulting from the download, installation, or use of software obtained from this page.</p>
+      <p>If you are unsure which software is correct for your system, <strong>contact FiTech technical support before proceeding</strong> at <strong>(951) 340-2624</strong>, Mon–Fri 7:00am–4:00pm PST.</p>
+    </div>
+    <button class="disclaimer-agree-btn" onclick="agreeDisclaimer()">
+      ✓ &nbsp;I Understand — Continue to Software Downloads
+    </button>
+    <div class="disclaimer-fine-print">This agreement is recorded for your session only. You will not be asked again during this visit.</div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="tsb-modal">
   <div class="modal-box">
     <button class="modal-close" onclick="closeTSBModal()">✕</button>
@@ -309,7 +350,6 @@ const DEFAULT_LINKS={
   "BETA-70050-SC-CTS-new-2dot":    "https://www.dropbox.com/scl/fi/8n6dh7y0r8vyu21zkd53e/70050-T541-SC-v1.53-CTS-ENABLED.zip?rlkey=hmvcn1t1nsvgfjtlv0zdb2t94&dl=1",
   "BETA-70050-SC-nitrous-new-2dot":"https://www.dropbox.com/scl/fi/i1k0bsmxap73opgg6sg7u/70050-T541-SC-v1.53-nitrous.zip?rlkey=64nstvvpyc0wrz3mugwogm5dc&dl=1",
   "BETA-30020-new-2dot":           "https://www.dropbox.com/scl/fo/wu5cdf8udutrx7qedgowy/AGkg98jEgtUwwVPeJN87Jlw?rlkey=8zcuweg277544qewshli91jmx&dl=1",
-  "BETA-70050-NA-IAT-correction-new-2dot": "https://www.dropbox.com/scl/fi/qx46pq3z2vsuvr95ls0ro/70050-T541-NA-500hp-New-2-DOT-v1.49-iat-correction.zip?rlkey=j2yxxn1d2vlmnkyembpclu364&dl=1",
 };
 const DEFAULT_VIDEOS={ecu:"https://www.youtube.com/embed/k_pQY21HY8g",handheld:"https://www.youtube.com/embed/JaAPfsIcOmE"};
 function getLinks(){try{const s=localStorage.getItem("fitech_links");return s?Object.assign({},DEFAULT_LINKS,JSON.parse(s)):DEFAULT_LINKS;}catch(e){return DEFAULT_LINKS;}}
@@ -575,8 +615,7 @@ function buildBetaSection(system, part, sub, hh){
   if(system.flow==="ls" && sub==="NA" && hh.id==="new-2dot"){
     betaFiles.push(
       {label:"LS NA — CTS Enabled (v1.53 Beta)", desc:"Includes Coolant Temperature Sensor corrections.", key:"BETA-70050-NA-CTS-new-2dot"},
-      {label:"LS NA — Nitrous (v1.53 Beta)",      desc:"Nitrous oxide tuning calibration.",               key:"BETA-70050-NA-nitrous-new-2dot"},
-      {label:"LS NA - IAT Correction (v1.53 Beta)", desc:"IAT Correction", key: "BETA-70050-NA-IAT-correction-new-2dot"},
+      {label:"LS NA — Nitrous (v1.53 Beta)",      desc:"Nitrous oxide tuning calibration.",               key:"BETA-70050-NA-nitrous-new-2dot"}
     );
   }
   // LS 16-bit SC beta files
@@ -676,6 +715,17 @@ function toggleBeta(){
 function openTSBModal(){document.getElementById("tsb-modal").classList.add("open");}
 function closeTSBModal(){document.getElementById("tsb-modal").classList.remove("open");}
 document.getElementById("tsb-modal").addEventListener("click",function(e){if(e.target===this)closeTSBModal();});
+
+// DISCLAIMER
+function agreeDisclaimer(){
+  document.getElementById("disclaimer-modal").classList.remove("open");
+  // Remember for this session so it doesn't pop up again on refresh
+  sessionStorage.setItem("fitech_agreed","1");
+}
+// If already agreed this session, don't show again
+if(sessionStorage.getItem("fitech_agreed")==="1"){
+  document.getElementById("disclaimer-modal").classList.remove("open");
+}
 
 buildSystemGrid();
 </script>
