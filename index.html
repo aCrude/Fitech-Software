@@ -543,7 +543,7 @@ function selectHH(hh,mode){
   S.hh=hh;
   document.getElementById("prog-4-detail").textContent=hh.name;
   const {system,part,sub}=S;
-  const sid=system.sharedSid||part.num;
+  const sid=system.sharedSid||(part.sid||part.num);
   let key;
   if(system.flow==="ls")key=`70050-${sub}-${hh.id}`;
   else if(system.flow==="ls32")key=`70050-32bit-${hh.id}`;
