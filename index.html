@@ -234,7 +234,7 @@
 
 <div class="support-bar">
   <p>Need help? Contact FiTech Technical Support: <a href="tel:9513402624">(951) 340-2624</a> &nbsp;|&nbsp; <a href="mailto:techmail@fitechefi.com">techmail@fitechefi.com</a></p>
-  <p class="hours" style="color:var(--gray-mid);font-size:.8rem;margin-top:4px;">Mon–Fri 7:00am–5:00pm PST &nbsp;|&nbsp; Saturday 8:00am–12:00pm PST</p>
+  <p class="hours" style="color:var(--gray-mid);font-size:.8rem;margin-top:4px;">Mon–Fri 7:00am–4:00pm PST</p>
 </div>
 
 <script>
@@ -315,15 +315,34 @@ function getLinks(){try{const s=localStorage.getItem("fitech_links");return s?Ob
 function getVideos(){try{const s=localStorage.getItem("fitech_videos");return s?Object.assign({},DEFAULT_VIDEOS,JSON.parse(s)):DEFAULT_VIDEOS;}catch(e){return DEFAULT_VIDEOS;}}
 
 const HANDHELDS={
-  "old-arrow":{id:"old-arrow",name:"Old Arrow Style",img:"Images/old-hh-arrows.gif",badge:"Arrow Joystick — Plugs in from TOP",desc:"Original joystick with white arrow keys around it. Cable connects at the top."},
-  "old-noarrow":{id:"old-noarrow",name:"Old No-Arrow",img:"Images/old-hh-no-arrows.gif",badge:"Older button-style — No arrow joystick",desc:"Older handheld with directional buttons but no arrow joystick. No dots on the side."},
-  "new-nodot":{id:"new-nodot",name:"New Style – No Dot",img:"Images/new-hh-no-dot.gif",badge:"Plugs in from BOTTOM — No Dots",desc:"New style with OK button in center. Cable plugs into bottom. No dots on right edge."},
-  "new-2dot":{id:"new-2dot",name:"New Style – 2 Dot",img:"Images/new-hh-2-dot.gif",badge:"Plugs in from BOTTOM — 2 Dots on side",desc:"Same as No-Dot but has two small dots visible on the right edge next to the buttons."},
+  "old-arrow":  {id:"old-arrow",   name:"Old Arrow Style",    img:"Images/old-hh-arrows.gif",  badge:"Arrow Joystick — Plugs in from TOP",          desc:"Original joystick with white arrow keys around it. Cable connects at the top."},
+  "old-noarrow":{id:"old-noarrow", name:"Old No-Arrow",       img:"Images/old-hh-no-arrows.gif",badge:"Older button-style — No arrow joystick",       desc:"Older handheld with directional buttons but no arrow joystick. No dots on the side."},
+  "new-nodot":  {id:"new-nodot",   name:"New Style – No Dot", img:"Images/new-hh-no-dot.gif",  badge:"Plugs in from BOTTOM — No Dots",               desc:"New style with OK button in center. Cable plugs into bottom. No dots on right edge."},
+  "new-2dot":   {id:"new-2dot",    name:"New Style – 2 Dot",  img:"Images/new-hh-2-dot.gif",   badge:"Plugs in from BOTTOM — 2 Dots on side",        desc:"Same as No-Dot but has two small dots visible on the right edge next to the buttons."},
+  "new-3dot":   {id:"new-3dot",    name:"New Style – 3 Dot",  img:"",                           badge:"Coming Soon — 3 Dot",                          desc:"New 3-Dot handheld. Software files will be available when this unit ships.", comingSoon:true},
 };
 
 const SYSTEMS=[
   {id:"tb",name:"Throttle Body",img:"Images/30002_1.webp",flow:"standard",showBaro:true,
-   parts:[{num:"30001",desc:"Go EFI 4 – 600 HP"},{num:"30002",desc:"Go EFI 4 – 600 HP"},{num:"30003",desc:"Go EFI 4 – 600 HP"},{num:"30004",desc:"Go EFI 8 – 800 HP"},{num:"30005",desc:"Go EFI 8 – 800 HP"},{num:"30008",desc:"Go EFI 8 – 800 HP"},{num:"30012",desc:"Go EFI Master/Slave"},{num:"30020",desc:"Go EFI in a Box"},{num:"30061",desc:"Go EFI Power Adder"},{num:"30064",desc:"Go EFI Power Adder"},{num:"39001",desc:"Go EFI 2-Barrel 400HP"},{num:"39610",desc:"Go EFI Tri-Power 600HP"}]},
+   parts:[
+      {num:"30001",desc:"Go EFI 4 600HP",                          sid:"30001"},
+      {num:"30002",desc:"Go EFI 4 600HP",                          sid:"30002"},
+      {num:"30003",desc:"Go Street EFI 400HP",                     sid:"30003"},
+      {num:"30004",desc:"Go EFI 4 Power Adder 600HP",              sid:"30004"},
+      {num:"30005",desc:"Easy Street 600HP",                       sid:"30005"},
+      {num:"30006",desc:"Go EFI 4 600HP Power Adder",              sid:"30004"},
+      {num:"30008",desc:"Go EFI 8 800HP",                          sid:"30008"},
+      {num:"30012",desc:"Go EFI 8 1200HP Power Adder",             sid:"30012"},
+      {num:"30013",desc:"Go EFI 8 1200HP",                         sid:"30012"},
+      {num:"30020",desc:"Go EFI Classic 650HP",                    sid:"30020"},
+      {num:"30021",desc:"Go EFI Classic 650HP",                    sid:"30020"},
+      {num:"30061",desc:"Go EFI 2×4 625HP",                        sid:"30061"},
+      {num:"30062",desc:"Go EFI 2×4 625HP",                        sid:"30061"},
+      {num:"30064",desc:"Go EFI 2×4 Power Adder 1200HP",           sid:"30064"},
+      {num:"30065",desc:"Go EFI 2×4 1200HP",                       sid:"30064"},
+      {num:"39001",desc:"Go EFI 2-Barrel 400HP",                   sid:"39001"},
+      {num:"39610",desc:"Go EFI Tri-Power 600HP",                  sid:"39610"},
+   ]},
   {id:"ls16",name:"LS System",img:"Images/LS.webp",flow:"ls",showBaro:false,skipParts:true,
    sharedNote:"All LS systems use the same software regardless of part number."},
   {id:"ls32",name:"LS System",img:"Images/LS.webp",flow:"ls32",showBaro:false,skipParts:true,cardBadge:"NEW — 32-bit ECU (Oct 2025+)",
@@ -332,10 +351,18 @@ const SYSTEMS=[
    sharedNote:"All Drive By Wire (DBW) systems use the same 32-bit software. The 2-Dot handheld is required."},
   {id:"tpi",name:"TPI System",img:"Images/TPI.webp",flow:"tpi",showBaro:false,
    sharedNote:"All TPI part numbers use the same software — select any to continue.",
-   parts:[{num:"38300",desc:"TPI System"},{num:"38301",desc:"TPI System"},{num:"38302",desc:"TPI System"},{num:"38303",desc:"TPI System"}]},
+   parts:[
+      {num:"38350",desc:"Ultimate SBC TPI Standalone EFI"},
+      {num:"38351",desc:"Ultimate TPI Standalone EFI With Dual O2"},
+      {num:"38352",desc:"Ultimate SBC TPI With Trans Control (4L60/4L80)"},
+      {num:"38353",desc:"Ultimate SBC TPI Dual O2 With Trans Control (4L60/4L80)"},
+   ]},
   {id:"ultraram",name:"Ultra Ram",img:"Images/Ultra_Ram.webp",flow:"standard",showBaro:false,sharedSid:"38301",
-   sharedNote:"All Ultra Ram systems use the same software file (38301).",
-   parts:[{num:"30008",desc:"Ultra Ram 500 HP"},{num:"30009",desc:"Ultra Ram 750 HP"}]},
+   sharedNote:"All Ultra Ram systems use the same software file.",
+   parts:[
+      {num:"38301",desc:"Ultra Ram SBC EFI"},
+      {num:"38302",desc:"Ultra Ram 800HP Chevy Big Block Rectangle Port EFI"},
+   ]},
   {id:"ultraport",name:"Ultra Port",img:"Images/Ultra_Port.webp",flow:"standard",showBaro:false,
    parts:[{num:"30010",desc:"Ultra Port 500 HP"},{num:"30011",desc:"Ultra Port 750 HP"}]},
   {id:"goport",name:"Go Port",img:"Images/Go_Port.webp",flow:"standard",showBaro:false,sharedSid:"30014",
@@ -444,10 +471,29 @@ function buildHHGrid(mode){
   const lock32=["old-arrow","old-noarrow","new-nodot"];
   const is32=(mode==="ls32"||mode==="dbw"||mode==="goshift-32bit"||mode==="tpi-32bit");
   Object.values(HANDHELDS).forEach(hh=>{
-    const locked=is32&&lock32.includes(hh.id);
-    const c=document.createElement("div");c.className="hh-card"+(locked?" locked":"");
-    c.innerHTML=`<img src="${hh.img}" alt="${hh.name}"><div class="hh-name">${hh.name}</div><div class="hh-id">${hh.badge}</div><div class="hh-desc">${hh.desc}</div>${locked?`<div class="hh-locked-msg">⛔ 32-bit ECU requires the 2-Dot handheld with v1.79+ software. This handheld is NOT compatible.</div>`:""}`;
-    if(!locked)c.onclick=()=>selectHH(hh,mode);
+    const isComingSoon=hh.comingSoon;
+    const locked=(is32&&lock32.includes(hh.id))||isComingSoon;
+    const c=document.createElement("div");
+    c.className="hh-card"+(locked?" locked":"")+(isComingSoon?" coming-soon":"");
+
+    // Build image — use placeholder if no image
+    const imgHtml = hh.img
+      ? `<img src="${hh.img}" alt="${hh.name}">`
+      : `<div style="width:170px;height:120px;margin:0 auto 14px;background:rgba(255,255,255,.05);border:2px dashed rgba(255,255,255,.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:2.5rem;">📦</div>`;
+
+    const comingSoonBadge = isComingSoon
+      ? `<div style="display:inline-block;margin-bottom:8px;padding:3px 10px;border-radius:10px;font-size:.72rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;background:rgba(255,255,255,.08);color:var(--gray-mid);border:1px solid rgba(255,255,255,.15);">🔜 Coming Soon</div>`
+      : "";
+
+    c.innerHTML=`${imgHtml}
+      ${comingSoonBadge}
+      <div class="hh-name">${hh.name}</div>
+      <div class="hh-id">${hh.badge}</div>
+      <div class="hh-desc">${hh.desc}</div>
+      ${is32&&lock32.includes(hh.id)?`<div class="hh-locked-msg">⛔ 32-bit ECU requires the 2-Dot handheld with v1.79+ software. This handheld is NOT compatible.</div>`:""}
+      ${isComingSoon?`<div class="hh-locked-msg" style="color:var(--gray-mid);">Software files will be added when this handheld is available.</div>`:""}`;
+
+    if(!locked) c.onclick=()=>selectHH(hh,mode);
     g.appendChild(c);
   });
 }
